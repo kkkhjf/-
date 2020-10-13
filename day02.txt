@@ -1,0 +1,32 @@
+1、变量的数据类型
+    基本数据类型：整数类型（byte、short、int、long）、浮点类型（float、double）、字符型、布尔型；
+    引用数据类型：类、接口、数组；
+    整形：byte（8bit{-128~127}）、short（16bit）、int（32bit）、long（64bit、long型变量结尾要带l）；
+    浮点型：float（32bit、7位有效数字）、double（32bit、14位有效数字）；
+    字符型：char（16bit、定义char型变量使用''且只能声明一个）；
+    布尔型：boolean（true、false）。
+2、类型转换
+    自动类型提升（不包含布尔型）：byte、char、short -->int --> long --> double，容量小的数据类型和容量大的数据类型做运算，结果自动升级为容量大的数据类型。
+                              当前三种数据类型做运算时，结果为int型；
+    强制类型转换（自动类型提升的逆运算）：需要使用强转符号（）、强制类型转换会造成精度损失。
+    注意：整型默认为int型、浮点型默认为double型。
+3、String类型
+    String（字符串）类型声明时要用""标记；
+    String可以和基本数据类型做运算，且只能做连接运算（+）。
+4、运算符
+    算数运算符：+、-、*、/、%、++（前后）、--（前后）；
+    赋值运算符：=（当赋值运算符两边数据类型不一致时，可以使用自动类型转换；可以连续赋值）；
+    比较运算符：==、!=、<、>、<=、>=;比较运算符结果为boolean值；
+    逻辑运算符：&、|、！、&&、||（前三个为逻辑，后两个为短路）；
+    位运算符：<<、>>、>>>、&、|、~；
+    三元运算符：（表达式）？表达式1：表达式2。
+5、Scanner获取键盘输入 
+    导包：import java.util.Scanner；
+    声明Scanner类的对象：Scanner in = new Scanner（System.in）；
+    调用Scanner类的对象实现获取键盘输入（int型）：int exp = in.nextInt()；
+    nextxxx（）方法实现获取不同的数据类型；
+6、分支结构
+    if-else：else就近原则；
+    switch-case：switch后的表达式不允许是boolean类型；switch-case可以转换成if-else，反之则不行。
+7、循环结构
+    for、while、do-while
