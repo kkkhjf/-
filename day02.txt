@@ -30,3 +30,7 @@
     switch-case：switch后的表达式不允许是boolean类型；switch-case可以转换成if-else，反之则不行。
 7、循环结构
     for、while、do-while
+8、break和continue
+    break结束当前循环，continue结束当次循环；
+    break默认跳出包裹此关键字最近的一层循环；
+    break/continue lable；可以跳出到指定位置，类似于goto。
