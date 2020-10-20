@@ -37,3 +37,22 @@
     
         重载与重写的区别：
             重载在编译期间就绑定好了，多态只有在运行的时候才知道具体的方法执行。
+
+4、instanceof关键字
+    a instanceof A :判断对象a是否是类的实例，是则返回true；
+    为了避免在向下转移之前出现classcastException异常，转换之前先用instanceof判断一下；
+
+5、向上转移和向下转移
+    向上转移：子类引用的对象转换为父类对象（多态）；
+    向下转移：父类引用的对象转换成子类类型。
+    
+6、Object类
+    object类是所有Java类的基类；
+    类在声明时没有使用extends关键字，则默认父类为java.lang.Object类；
+    Object类中的功能具有通用性：
+        属性（无）
+        方法（equals(/toString()/getClass()/hashCode()/clone()/finalize()/wait()/nofityAll()）
+    equals方法：
+        equals（）和==的区别：
+            ==：运算符使用在基本数据类型和引用数据类型之间，如果是基本数据类型变量，就是比较数据是否相等；如果是引用数据类型则比较地址值是否相同；
+            equals（）：只是一个方法，适用于引用数据类型；Object类中定义equals（）和==作用相同；在String、Date、File、包装类等都重写了equals（）方法，比较的是实体内容是否相等；
