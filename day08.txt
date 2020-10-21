@@ -39,7 +39,7 @@
             重载在编译期间就绑定好了，多态只有在运行的时候才知道具体的方法执行。
 
 4、instanceof关键字
-    a instanceof A :判断对象a是否是类的实例，是则返回true；
+    a instanceof A :判断对象a是否是类的实例（左边是变量，右边是类型），是则返回true；
     为了避免在向下转移之前出现classcastException异常，转换之前先用instanceof判断一下；
 
 5、向上转移和向下转移
