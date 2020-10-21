@@ -2,10 +2,62 @@
     在String类中的equals（）方法，主要是对字符串（实际上是字符数组的内容）进行比较；重写equals（）方法，先判断地址是否相同，再判断是否
 是同一个类的实体，最后再利用重载的特性，调用sString类中的equals（）方法。
 
-2、对继承性的补充
+2、对继承性的补充    
     在父类中只声明了带参的构造器，在继承的子类中也需要声明一个带参的构造器（构造器里要用super（父类中的参数列表）关键字），或是在父类中
         声明一个无参的构造器。
     向下转型和向上转型：
         当父类需要调用子类的扩充方法时，才需要向下转型；
         向下转型之前一定要进行向上转型，否则在转型时会出现ClassCastException（类型转换异常–运行时异常）；
         向下转型前要先判断在转型，避免出现异常（依靠instanceof关键字实现）引用名 instanceof 类 表示该引用是否能表示该类实例，返回boolean类型。
+3、重写Object类中的equals（）方法
+	equals（）方法在Object类中是简单的==，利用Java的多态性，实现常用的equals（）方法和==之间的区别；
+	equals（）方法重写的原则：对称性、自反性（自比永远是true）、传递性、一致性（重复多少次结果不变）、比null和不同数据类型永远是false；
+	equals（）重写：
+		public boolean equals(Object obj) {
+			if(obj == this)
+				return true;
+		
+			if(obj instanceof Order) {
+				Order order = (Order)obj;
+			
+			return this.orderId == order.orderId && this.orderName.equal(order.orderName);
+			
+			}
+			return false;
+	    }
+4、toString()方法：
+    出一个对象的引用时，默认调用同String（）方法；
+	toString（）方法定义：
+			public String toString（）{
+				return getClass（）.getName() + "@" + Intteger.toHexString(hashCode());
+			}
+	String、Date、File、包装类等重写了tostring（）方法；
+
+5、单元测试
+    将代码划分为一个个单元，对每个单元进行单独测试；
+    单元测试步骤（eclipse）：
+        选中当前工程--右键选择bulid path--add libraries--JUnit 4；
+        创建Java类，进行单元测试，对该类的要求（此类是public、此类提供公共的无参的构造器）
+        此类中声明单元测试方法，此时的单元测试方法，方法的权限是public，没有返回值，没有形参
+        单元测试方法上需要声明@Test注解，并在单元测试类中导入import org.junit.Test；
+        声明好单元测试方法以后，左键双击单元测试方法名，右键run as--JUnit Test。
+    
+    说明：
+        如果执行结果没有任何异常显式绿条，反之出现红条。
+        
+6、包装类
+    针对八种基本数据类型定义相应的应用类型--包装类（封装类）；
+    自动装箱与自动拆箱：
+        自动装箱：int num = 10; Integer in1 = num;
+        自动拆箱：int num1 = in1;
+    基本数据类型、包装类和String三者之间的转换：
+        基本数据类型--->包装类
+            调用包装类的构造器（int num; Integer in1 = new Integer(num)）
+        包装类--->基本数据类型
+            调用包装类的xxxValue()（Integer in1 = new Integer(12); int i1 = in1.intValue();）；
+        基本数据类型、包装类--->String类型
+            方式一：int num = 10; String str = num + "";
+            方式二：String str = String.valueof(num);/Double d = new Double(12.3);String str = String.valueof(d);
+        String类型--->基本数据类型和包装类
+            调用包装类中的parseXxx(String s)(String str = "123"; int num = Integer.parseInt(str));
+        注：Integer内部定义了一个Integercache结构，其中定义了一个Integer[]数组（-128~127），可以直接使用数组中的元素，不用再去new一个新的存储空间。
