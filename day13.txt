@@ -1,0 +1,58 @@
+1、异常处理
+    异常：Java程序执行中发生不正常的情况称为异常；
+    Java两类异常事件Error和Exception：
+        Error：Java虚拟机无法解决的问题；
+        Exception：因编程错误或偶然的外因导致的一般性问题，可以使用针对性代码进行处理（空指针访问、试图读取不存在的文件、数组角标越界）。。。
+
+2、常见的异常：
+    运行时异常：NullPointEexception（空指针异常）、ArrayIndexOutOfBoundsException（数组下标越界异常）、ClassCastException（类型转换异常）
+    NumberFormatException（数值类型异常）、InputMismatchException（输入不匹配异常）、ArithmeticException（算数异常）。
+    编译时异常：编译过程中编译器报错。
+
+3、异常处理
+    Java中将异常处理的程序代码集中在一起，与正常的程序代码分开。
+    异常处理（抓抛模型）
+        过程一：程序正常执行过程中，一旦出现异常，就会在异常代码处生成一个对应异常的对象，并将此对象抛出。
+                一旦抛出对象以后其后的代码不再执行。
+                异常对象的产生：系统自身创造、手动的产生（throw）；
+        如何自定义异常类：
+            继承现有异常结构（RuntimeExeption、Exception）；
+            提供全局变量 serialVersionID；
+            提供重载的构造器
+        过程二：异常的处理方式：try-catch-finally 、hrows+异常处理。
+    try-catch-finally的使用：
+        try{
+            //可能出现的异常
+        }catch（异常类型1 变量名1）{
+            //处理异常的方式1
+        }catch（异常类型2 变量名2）{
+            //处理异常的发方式2
+        }......
+        finally{
+            //一定会执行的代码
+        }
+        
+    finally
+        说明：finally是可选的；
+             finally中声明的是一定会执行的代码，即使catch中又出现异常了，try和catch中有return语句等情况；
+             数据库连接、输入输出流、网络编程Socket等资源，jvm是不能自动回收的，我们自己手动进行资源的释放，此时需要声明在finally中；
+             try-catch-finally结构可以嵌套；
+             使用try将可能的异常代码包装起来，在执行过程中，就会生成一个对应的异常类的对象，根据此对象的类型去catch中进行匹配；
+             一旦try中的异常对象匹配到某一个catch时，就会进入catch中进行异常的处理，一旦处理完成就跳出当前try-catch结构（无finally情况）；
+             catch中的异常类型没有子父类关系上下顺序无所谓，反之子类在上父类在下；
+             常用的异常处理方式：String getMessage（）、printStackTrace（）；
+             在try结构中声明定义的变量不能在外面使用；
+             使用try-catch-finally处理编译异常时，使得程序在编译时就不再报错，但是运行时可能报错，相当于我们使用try-catch-fianlly将一个编译时可能出现的异常，延迟到运行时出现。
+   
+    throws+异常类型：
+        权限修饰符 返回类型 方法名（）throws 异常类型1，异常类型2，...{
+            //方法体
+        }
+        生命在方法的声明处，指出此方法执行时可能会出现异常，一旦方法体执行出现异常时，仍会在异常代码处
+            生成一个异常类的对象，此对象满足throws后异常的类型时，异常代码后续的代码就不再执行。
+开发中选择try-catch-finally和throws+异常类型：
+    如果父类的方法没有写throws，子类重写该方法也不能用throws（子类抛出的异常不能大于父类），只能用try-catch处理异常；
+    执行的方法a中先后有调用另外的几个方法，这几个方法是递进关系执行，我们建议这几个方法使用throws的方式递进处理，而执行的方法a可以使用try-catch处理；
+
+throws和throw的区别
+    throws是向上传递异常，声明在方法的声明处；throw是创建异常对象，声明在方法体内。 
