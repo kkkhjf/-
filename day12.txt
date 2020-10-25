@@ -47,3 +47,23 @@
             匿名内部类中不能存在任何的静态成员变量和静态方法。
             匿名内部类为局部内部类，所以局部内部类的所有限制同样对匿名内部类生效。
             匿名内部类不能是抽象的，它必须要实现继承的类或者实现的接口的所有抽象方法。
+    接口作为返回类型：
+    	接口类似于抽象类，是为了扩充Java多继承的特点。同时也可以作为返回类型，例如ProjectIII中NameListService类中的creatEquipment方法：public Equipment creatEquipment(int index)
+	    当接口作为返回类型时，类似于多态性的体现，creatEquipment方法中返回的时各个设备类，Equipment equipment = creatEquipment(i);接受的对象equipment只能访问getDescription（）方法
+	    ，即每个设备类中重写的该方法。这一点于多态性有着极高的相似度。所以当接口是以返回类型出现时，可以理解为是多态的一种体现。
+	    public interface Equipment {
+		public abstract String getDescription();
+	    }
+    各种关键字（static,final,abstract）:
+    	static修饰属性、方法、代码块和内部类；
+	final修饰类、方法和属性；
+	abstract修饰类和方法。
+    abstract和接口的异同：
+    	相同点：
+    	    抽象类可以有构造方法，接口中不能有构造方法；
+	    抽象类中可以包含非抽象的普通方法，接口中的所有方法必须是抽象的；
+	    抽象类中可以有普通成员变量，接口没有普通成员变量；
+	    抽象类中可以包含静态方法，接口中不可以有；
+	    抽象类和抽象类和接口中都可以包含静态成员变量,抽象类中的静态成员变量的访问类型可以任意,但接口中定义的变量只能是public static final 类型,并且默认即为public static final 类型；
+	不同点：
+	    不能实例化，都可以包含抽象方法。
