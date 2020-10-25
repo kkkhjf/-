@@ -21,7 +21,7 @@
 		Java中，接口和类是并列的两个结构；
 		 接口定义：
 				JDK7及以前（只能定义全局常量和抽象方法）
-						全局常量：public static final定义的
+						全局常量：public static final定义的（接口中的变量都是被final修饰）
 						抽象方法：public static abstract定义的
 				JDK8（除了定义全局常量和抽象方法之外，还可以定义静态方法、默认方法等）
 		接口中不允许定义构造器，意味着接口不可以实例化；
