@@ -30,3 +30,5 @@
         setName（）：设置当前线程的名字【对象.serName（设置名字）】；
         yield（）：释放当前CPU的执行；
         join（）：在线程A中调用线程B的join方法，此时线程A就进入阻塞状态，知道线程B完全执行完后，线程A才结束阻塞状态。
+        sleep（long millis）：令当前线程在指定时间内放弃对CPU的控制；
+		isAlive（）：判断当前线程是否存火。
