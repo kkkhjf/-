@@ -1,0 +1,40 @@
+1、线程的同步（重温）
+    同步机制的实现
+        同步代码块
+            synchronized（同步监视器）{
+							
+							//需要被同步的代码
+						}
+            注：用实现Runnable接口实现同步机制可以考虑使用this作为锁，用继承Thread类实现同步机制可以考虑使用当前类当作锁。
+        同步方法
+            将需要被同步的代码放在一个方法里，在方法名前加上synchronized修饰。
+            注：synchronized 修饰方法使用锁是当前this锁，synchronized 修饰静态方法使用锁是当前类的字节码文件。
+            
+        ⭐⭐使用synchronized时一定要注意不同的对象一定要把握同一把锁！！！
+        ⭐⭐如果调用被同步的代码是不同的类，则需要将被同步的代码放在一个类中，在需要调用被同步代码的类中将被调用的类声明为自己的成员；
+             如果利用包含需要被同步的代码的类，则需要注意每个对象是否共用同一把锁，如果不是则需要将锁声明为类的属性而不是对象的属性；
+
+2、线程创建方式三---Callable接口
+    创建一个实现callable接口的实现类；
+    实现call方法，将此线程需要执行的操作声明在call（）方法中，call（）方法可以有返回值；
+    创建callable接口实现类的对象；
+    将此callable接口实现类的对象传递到FutureTask构造器中，创建FutureTask的对象；
+    将FutherTask的对象作为参数传递到Thread类的构造器中，创建Thread对象，并start（）该对象；
+    获取callable中call（）方法的返回值。
+    
+    callable比runnable强大的原因：
+        call（）方法有返回值；
+        call（）方法可以抛出异常，被外面的操作捕获；
+        callable可以支持泛型。
+
+3、创建线程方式四---线程池
+    提前创建好多个线程，放入多个线程池中，使用时直接获取，使用完放回池中，可以避免频繁创建销毁、实现重复利用；
+    线程池优点：提高响应速度、降低资源消费、便于线程管理（可以设置：核心池的大小、最大线程数、线程没有任务时最多保持多长时间后会终止）；
+    创建线程池的步骤：
+        提供指定线程数量的线程池（ExecutorService service = Executors.newFixedThreadPool(10);）；
+        执行指定地线程操作，需要提供1实现Runnable接口或Callable接口实现类的对象；
+            service.submit();//适用于Callable
+            service.execute();//适用于Runnable
+        关闭线程池；
+            service.shutdown();//关闭连接池
+    
