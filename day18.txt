@@ -1,0 +1,28 @@
+1、String、StringBuffer、StringBuilder三者区别：
+    String：不可变的字符序列；
+    StringBuffer：可变的字符序列（线程安全，效率低），默认创建一个16个字符的字符数组；
+    StringBuild：可变字符序列（线程不安全，效率高）。
+    
+    StringBuffer对象的内存不够时，可以使用扩容数组；
+    StringBuffer常用方法：
+        append()向StringBuffer添加字符串；
+        delete()删除指定位置的内容；
+        replace()把start，end位置替换为str；
+        insert()在指定位置插入xxx；
+        reverse()把当前字符串逆转；
+        substring：返回一个左闭右开区间的字串；
+
+2、Date类
+    两个构造器（）
+        Date()：创建一个对应当前时间的Date对象；
+        Date(long date)：创建一个指定毫秒数的Date对象。
+    两个方法
+        toString():显式当前年月日
+        getTime():获取当前Date对象对应的毫秒数
+    java.sql.Date对应着数据库中的日期类型变量
+        实例化：
+            Date 对象1 = new java.sql.Date(int long);
+            java.sql.Date 对象2 = (java.sql.Date) 对象1;
+            
+        
+    
