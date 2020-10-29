@@ -11,6 +11,9 @@
         insert()在指定位置插入xxx；
         reverse()把当前字符串逆转；
         substring：返回一个左闭右开区间的字串；
+    String与StringBuffer、StringBuilder之间的转换
+        String--->StringBuffer、StrungBuilder：调用StringBuffer、StringBuilder的构造器
+        StringBuffer、StrungBuilder--->String：调用String构造器，StringBuffer、StrungBuilder的toString()方法。
 
 2、Date类
     两个构造器（）
@@ -21,8 +24,12 @@
         getTime():获取当前Date对象对应的毫秒数
     java.sql.Date对应着数据库中的日期类型变量
         实例化：
+            情况一：
             Date 对象1 = new java.sql.Date(int long);
             java.sql.Date 对象2 = (java.sql.Date) 对象1;
+            情况二：
+            Date date6 = new Date();
+            java.sql.Date date7 = new java.sql.Date(date6.getTime());
             
         
     
