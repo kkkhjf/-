@@ -30,6 +30,21 @@
             情况二：
             Date date6 = new Date();
             java.sql.Date date7 = new java.sql.Date(date6.getTime());
+    SimpleDateFormat类的使用
+        格式化地实现（日期--->字符串）
+            SimpleDateFormat 对象1 = new SimpleDateFormat();//无参构造器
+            SimpleDateFormat 对象1 = new SimpleDateFormat("yyyy-MM--dd hh:mm:ss");//有参构造器
+            Date 对象2 = new Date();
+            String 字符串1 = 对象1.format(对象2);
+        格式化地解析（字符串--->日期）
+            String 字符串1 = "时间格式";
+            Date 对象3 = 对象1.parse(对象2);
+    Calendar类（抽象类）的使用
+        实例化：
+            方式一：创建其子类GregorianCalendar的对象
+            方式二：调用其静态方法getInstance()
+                Calendar calendar = Calendar.getInstance();
+        常用方法：
+            get()获取一些Calendar类中定义的常量的值；
+            ste()将Calendar对象
             
-        
-    
