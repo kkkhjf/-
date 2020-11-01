@@ -1,0 +1,95 @@
+1、枚举类
+    类的对象只有有限个，确定的，称此类为枚举类；
+    当需要定义一组常量时，强烈建议使用枚举类；
+    如果枚举类只有一个对象，则可以作为单例模式的实现方式。
+
+2、定义枚举类
+    自定义枚举类
+        声明枚举类对象的属性（private final修饰）
+        私有化构造器；
+        提供当前枚举类的多个对象（声明为public static final）
+        提供获取当前枚举类对象的属性的方法
+        提供toString()方法
+    使用enum关键字定义
+        提供当前枚举类的对象，多个对象之间用","隔开，末尾对象";"结束（对象名（内容），不需要其他修饰符和赋值符号）；
+        其他同自定义步骤；
+        enum关键字修饰的枚举类，继承于Java.lang.Enum；
+        values()、valueOf()方法
+            values()返回一个包含枚举类所有对象的一个数组；
+            valueOf(String objName)返回枚举类中对象名是objName的对象，如果没有objName的枚举类对象则会抛出异常。
+    使用enum关键字实现接口
+        实现接口，在enum枚举类中实现抽象方法；
+        提供当前枚举类的对象分别实现接口中的抽象方法（在对象后加上{//定义抽象方法}）
+        枚举类的调用：枚举类名 对象名 = 枚举类名.枚举类实例名
+        
+3、注解
+    注解是代码里的特殊标记(@***)，这些标记可以在编译、类加载、运行时被读取，并执行相应的处理；
+    注解可以像修饰符一样修饰包、类、构造器、方法、成员变量、参数和局部变量的声明；
+    JDK中三个基本注解(@Override、@Deprecated、@suppressWarnings)
+        @Override：标注该方法是重写的方法；
+        @Deprecated：标注类、方法等已过时；
+        @suppressWarnings：抑制编译器警告；
+    如何自定义注解
+        参照suppressWarnings定义
+            注解声明为@interface；
+            内部定义成员，通常使用value表示；
+            可以指定成员默认值，使用default定义；
+            如果自定义的注解没有成员，表示是一个标识。
+            注：如果注解有成员，在使用注解时需要指明成员的值。
+    jdk中的四种元注解
+        @Retention：只当所修饰的注解的生命周期（SOURCE\CLASS默认\RUNTIME）只有声明为RUNTIME生命周期的注解，才能通过反射获取。
+        @Target：指明被修饰的注解能够修饰哪像元素{TYPE,FIELD,METHOD,PARAMETER,CONSTRUCTOR,LOCAL_VARIABLE,TYPE_PARAMETER等}；
+        @Documented：指明被该元注解修饰的注解类将被Javadoc工具提取成文档，默认情况下，javadoc不包括注解；
+        @Inherited：被它修饰的注解将具有继承性。
+    注解的新特性：
+         可重复性：在注解上声明@repeadtable，成员值为注解名.class
+                  注解的Target和Retention等元注解和注解相同。
+          
+4、集合
+    概述
+        集合、数组都是对多个数据进行存储（内存层面）操作的结构，简称Java容器；
+        数组在存储多个数据的特点：
+            一旦初始化后，其长度就确定了；
+            数组一旦定义好，元素的数据类型也就确定；
+            一旦初始化后，数组长度不可变（缺）；
+            数组中提供的方法非常有限，删除和插入操作非常不便，效率不高；
+            数组获取内部实际元素个数没有现成的属性或方法；
+            数组对于元素不可重复的需求，无法满足。 
+    Java集合Collection和Map两种体系
+        Collection接口：单列数据，定义了存取一组对象的方法的集合；
+                        List：元素有序、可重复的集合；（动态数组）
+                             实现方法： ArrayList、LinkedList、Vector
+                        Set：元素无序、不可重复的集合。（类似于数学集合）
+                              实现方法：HashSet、LinkedHashSet、TreeSet
+        Map接口：双列数据，保存具有映射关系"key-value"：一对数据--->类似于数学函数；
+                  实现方法：HashMap、LinkedHashMap、TreeMap、HashTable、Properties
+    Collection接口中的方法
+        向Collection类接口的实现类的对象中添加数据obj时，要求obj所在类要重写equals()方法；
+        add(Object obj)向ArrayList对象中添加数据；
+        contains()判断ArrayList对象中是否包含对应的数据；
+        remove(Object obj)从当前集合中移除obj元素；
+        addAll()并集、removeAll()差集、retainAll()交集；
+        hashCode()返回当前对象的哈希值；
+        toArray()集合--->数组   asList()数组--->集合返回的是List对象；
+        iterator()返回迭代器Iterator接口的实例，用于遍历集合元素。
+            迭代器声明方式：Iterator 对象名 = 集合名.iterator();
+            hasnext()判断是否还有对象可以输出和next()输出下一个对象；
+            集合对象每次调用iterator()方法都得到一个全新的迭代器对象，默认游标都在集合的第一个位置之前；
+            remove()移除当前对象，调用remove时一定要让迭代器指向集合里的数据。
+        foreach循环
+            for( 集合数据类型 变量名:集合名){
+                //循环体
+              }
+    List接口（ArrayList、LinkedList、Vector）
+        ArrayList、LinkedList、Vector三者异同
+            ArrayList；作为List接口的主要实现类；底层使用Object[] elementData存储；
+            LinkedList：对于频繁的插入、删除操作，使用此类效率比ArrayList高；底层使用的是双向链表存储
+            Vector：作为List接口的古老实现类，线程安全，效率低；底层使用Object[] elementData存储；
+        ArrayList底层源码分析
+            jdk7：
+                创建时，初始化一个长度为10的Object[]数组elementData；
+                如果添加元素数达到elementData数组的上限，则扩容，默认情况下扩容1.5倍。
+            jdk8：
+                创建时，初始化一个长度为10的Object[]数组elementData，此时数组为{}；
+                第一次调用添加操作，底层才开始创建数组；
+                后续操作和jdk7一致。
