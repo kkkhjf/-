@@ -41,4 +41,12 @@
         需要使用两种排序方法（comparaTo()和comparator()）
         自然排序中（comparaTo()），比较两个对象是否相同的标准为：compareTo()返回0，不再是equals()；
         定制排序中（comparator()），比较两个对象是否相同的标准为：compare()返回0，不再是equals()。
+
+
+补充说明：
+    Collection集合与数组间的转换
+    	集合--->数组：toArray()
+	Object[] arr = coll.toArray();
+	数组--->集合：调用Arrays类的静态方法aSList()
+	    List<String> list = Arrays.asList(new String[]{"AA","BB","CC"});
     
