@@ -1,0 +1,60 @@
+1、Map中定义的方法
+    添加、删除、修改操作
+        Object put(Object key,Object Value)//将指定的key-value添加到（或修改）当前map对象中
+        void putAll(Map m)//将m中的所有key-value对存放在当前map中
+        void clear()//清空当前map中的所有数据
+    元素查询操作
+        Object get(Object key)//获取指定key对应的value
+        boolean containsKey(Object key)//判断是否包含指定地key
+        boolean containsValue(Object value)//包含指定的value
+        int size()//返回map中key-value对的个数
+        boolean isEmpty()//判断当前map是否为空
+        boolean euqals(Object obj)//判断当前map和参数对象obj是否相等
+    元视图操作方法
+        Set keySet()//返回所有key构成的Set集合，再利用Iterator iterator = set.iterator();
+        Collection values()//返回所有value构成的Collection集合，使用foreach和Iterator进行遍历；
+        Set entrySet()//返回所有key-value；
+    方法总结： 
+    添加：Object put(Object key,Object Value)
+    删除：remove(Object key)
+    修改：Object put(Object key,Object Value)
+    查询：Object get(Object key)
+    长度：int size()
+    遍历：keySet() / Values() / entrySet()
+    
+2、Collections类
+    Collections是一个操作Set、List和Map等集合的工具类，提供了一系列静态方法对集合元素进行排序、查询和修改等操作，还提供了对集合对象设置不可变、对集合对象实现同步控制等方法；
+    Collections常用方法
+        reverse(List):反转List中的元素；
+        shufflr(List):对List中的元素进行随机排序；
+        sort(List):根据元素的自然顺序对指定的List集合按升序排序；
+        sort(List,Comparator):根据指定的Comparator产生的顺序对List集合元素进行排序；
+        swap(List,int i,int j):将指定地list集合中的i处元素和j处元素进行交换；
+        frequency(Collection ,Object):将src中的内容复制到dest中；
+        copy(List dest,List src):将src中的数据复制到dest中；
+            List dest = Array.asList(new Object[src.size()]);//先要把dest的存储空间填满，才能保证复制的顺利进行，dest的数组长度要大于等于src的数组长度；
+        将HashMap和ArrayList转换成线程安全，synchronizedList(List list)和synchronizedMap(Map map)。
+
+3、泛型
+    泛型指在定义类、接口时通过一个标识表示类中某个属性的类型或者某个方法的返回值及参数类型；这个参数类型将在使用时确定。
+    泛型在集合中的使用：
+        ArrayList<Integer> arr = new arraylist<Integer>();
+    嵌套泛型：
+        Iterator<Map.Entry<String,Integer>> ite = map.entrySet().iterator();
+    在集合中使用泛型小结：
+        集合接口或集合类在jdk5.0时都修改为带泛型的解构；
+        在实例化集合类时，可以指明具体的泛型类型；
+        指明完后，在集合类或者接口中凡是定义类或接口时，内部结构（方法，构造器，属性）使用到类的泛型的位置，都指定为实例化时的泛型类型
+        如果实例化时，没有指明泛型的类型，默认类型为java.lang.Object类型；
+        注：泛型的类型必须是类，不能是基本数据类型，需要用到基本数据类型的位置，那包装类进行转换；
+    自定义泛型结构（泛型类、泛型接口和泛型方法）
+        class Order<T>{
+            T 属性;
+            public T get属性(){
+                //类方法
+            }
+            //类的主体
+        }
+        由于子类在继承带泛型的父类时，指明了泛型类型，则实例化子类对象时，不再需要指明泛型；
+        注：如果定义了泛型类，实例化没有指明类的泛型，则认为此泛型为Object类型；
+    
