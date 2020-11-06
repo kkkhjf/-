@@ -1,0 +1,60 @@
+1、自定义泛型类、泛型接口
+    泛型类可能有多个参数，此时应将多个参数一起放在尖括号内；
+    泛型的构造器如下：public GenericClass(){}，而不是public GenericClass<E>{}；
+    实例化后，操作原来泛型位置的结构必须与指定的泛型类型一致；
+    泛型不同的引用不能相互赋值；
+    泛型如果不指定，将被擦除，泛型对应的类型均按照Object处理，但不等价于Object；
+    如果泛型类是一个接口或者抽象类，则不可以创建泛型类的对象；
+    静态方法不能使用类的泛型，异常类不能声明为泛型类；
+    不能使用new E[],但是可以：E[] elements = (E[])new Object[capacity]；
+    父类有泛型，子类可以选择保留泛型也可以选择指定泛型类型
+        子类不保存父类的泛型（按需实现）：
+            去除父类的所有泛型；
+            把父类的泛型都具体实现（泛型子类）；
+        子类保留父类的泛型：
+            全部保留；
+            部分保留；
+    jdk1.7，泛型的简化操作：ArrayList<Fruit> fruit = new ArrayList<>()；
+    泛型的指定中不能使用基本数据类型，可以使用包装类替换。
+
+2、泛型方法
+    方法中使用类的泛型不一定是泛型方法；
+    在方法中出现了泛型的结构，泛型参数与类的泛型参数没有任何关系；换句话说，泛型方法所属的类是不是泛型类都没有关系；
+    泛型方法的声明：
+        权限修饰符  <泛型>  数据类型<泛型>  copyFormArrayToList(泛型[] arr){
+            //方法体；
+        }
+    泛型方法可以声明为静态的，因为泛型参数是在调用方法时确定的，并非在实例化类时确定。
+    
+3、泛型在继承方面的体现
+    虽然类A是类B的父类，但是G<A>和G<B>二者不具备子父类的关系，二者是并列关系；
+        注：类A是类B的父类，A<G>是B<G>的父类；
+        
+4、通配符的使用
+      通配符：？；
+      类A是类B的父类，G<A>和G<B>是没有关系的，二者共同的父类是：G<?>；
+      例如：
+           List<Object> list1 = null;
+           List<String> list2 = null;
+          
+           List<?> list = null;
+           list = list1;
+           list = list2;
+       通配符的遍历：
+           public void print(List<?> list){    
+               Iterator<?> ite = new list.iterator();
+               while(iterator.hasNext()){
+                  Object obj = iterator.next();
+                  System.out.println(obj);
+              }
+          }
+        写入：对于List<?>就不能向其内部添加数据，除了null；
+        读取： 允许读取数据，读取的数据类型为Object类.
+
+5、有限制条件通配符的使用
+    ？ extends ClassA   ① (? <= ClassA)
+        G<? extends ClassA>可以作为G<A>和G<B>的父类，其中B是A的子类；
+    ？ super ClassA     ② (? >= ClassA)
+        G<? super ClassA>可以作为G<A>和G<B>的父类，其中B是A的父类；
+    通配符？代表一个不确定的类，①代表该类可以是其本身或子类；②代表该类可以是其本身或父类；
+      
