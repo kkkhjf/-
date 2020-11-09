@@ -46,11 +46,11 @@
         按照流的流向区分：输入流，输出流
         按照角色不同区分：节点流（直接作用在文件上），处理流（在节点流上包裹的流）。
     流的体系结构（Stream结尾的是字节流）：
-        抽象基类                节点流(或文件流)              缓冲流(处理流的一种)
-        InputStream             FileInputStream             BufferedInputStream
-        OutputStream            FileOutoutStream            BufferedOutputStream
-        Reader                  FileReader                  BufferedReader
-        Writer                  FileWriter                  BufferedWriter
+        抽象基类                节点流(或文件流)                               缓冲流(处理流的一种)
+        InputStream             FileInputStream（read(byte[] b)）             BufferedInputStream（read(byte[] b)）
+        OutputStream            FileOutoutStream（write(byte[] b,o,len)）     BufferedOutputStream（write(byte[] b,0,len)）
+        Reader                  FileReader（read(char[] c)）                  BufferedReader（read(cahr[] c)/readline()）
+        Writer                  FileWriter（write(char[] c,0,len)）           BufferedWriter（write(cahr[] c,0,len)）
     读入（FileReader为例）
         实例化File类的对象，指明要操作的文件（File file = new File(".\\hello.txt");）；
         提供具体的流（FileReader fr = new FileReader（file））；
@@ -118,21 +118,21 @@
         DataInputStream和DataOutputStream（用于读取或写出基本数据类型的变量或字符串）
         DataoutputStream写出的数据必须要用DataInputStream读入，读取数据的顺序要和写入的顺序一致；
         @Test
-    public void DataOutStreamTest() throws IOException {
-        DataOutputStream dos = new DataOutputStream(new FileOutputStream("abc.txt"));
-        dos.writeUTF("hejianfeng");
-        dos.writeChar('Y');
-        dos.writeBoolean(false);
+        public void DataOutStreamTest() throws IOException {
+             DataOutputStream dos = new DataOutputStream(new FileOutputStream("abc.txt"));
+             dos.writeUTF("hejianfeng");
+             dos.writeChar('Y');
+             dos.writeBoolean(false);
 
-        dos.close();
-    }
-    @Test
-    public void DataInStreamTest() throws IOException {
-        DataInputStream dis = new DataInputStream(new FileInputStream("abc.txt"));
-        String str = dis.readUTF();
-        char v = dis.readChar();
-        boolean flag = dis.readBoolean();
+             dos.close();
+          }
+        @Test
+        public void DataInStreamTest() throws IOException {
+            DataInputStream dis = new DataInputStream(new FileInputStream("abc.txt"));
+            String str = dis.readUTF();
+            char v = dis.readChar();
+            boolean flag = dis.readBoolean();
 
-        System.out.println("String: " + str + " Char: " + v + " Boolean: " + flag);
-        dis.close();
-    }
+            System.out.println("String: " + str + " Char: " + v + " Boolean: " + flag);
+            dis.close();
+        }
