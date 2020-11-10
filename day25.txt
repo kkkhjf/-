@@ -15,5 +15,53 @@
             Object obj = ois.readObject();
     Java对象满足序列化的要求
         对象所在的类必须实现Serializable接口；
-        需要给当前类提供一个全局常量serialVersionUID。
+        需要给当前类提供一个全局常量serialVersionUID；
+        除了当前类需要实现Serializable接口之外，还必须确保类中所有属性也必须是可序列化的
+    serialVersionUID
+        serialVersionUID用来表明类的不同版本之间的的兼容性，jvm会把传来的字节流中的ID与本地ID相比较，如果相同则认为一致，可以进行反序列化，否则出现异常；
+        如果类没有显式地定义这个静态常量，它的值是Java运行时环境根据类的内部细节自动生成的，类的实例变量做了修改，其本身也可能修改；
+
+2、随机存储文件流
+    RandomAccessFile的使用
+        RandomAccessFile直接继承于java.lang.Object类，实现了DataInput和DataOutput接口；
+        RandomAccessFile既可以作为输入流也可以作为输出流；
+        如果RandomAccessFile作为输出流，写出到的文件不存在，则在执行过程中会自动创建，如果写出的文件存在，则会从头开始覆盖原有文件内容；
+        可以通过RandomAccessFile.seek(long pos)调动指针位置，从而实现“插入效果”；
+    构造器：
+        public RandomAccessFile(File file,String mode);
+        public RandomAccessFile(String name,String mode);
+        注：mode参数指定RandomAccessFile的访问方式（r：只读；rw：读写；rwd：读写和同步文件内容的更新；rws：读写，同步文件内容和元数据的更新）
     
+3、网络编程
+    目的：直接或间接地通过网络协议与其他计算机实现数据交换，进行通信；
+    网络编程的两个主要问题
+        如何准确地定位网络上的一台或多台主机，定位主机上的特定应用；
+        找到主机后如何可靠高效地进行数据传输。
+    IP和端口号
+        ip用来区分主机；
+        端口号用来区分应用程序，不同进程拥有不同的端口号。
+    网络通信协议
+        OSI七层协议（物理层、数据链路层、网络层、传输层、会话层、表示层、应用层）
+        TCP/IP四层协议（物理+数据链路层、网络层、传输层、应用层（会话、表示、应用））
+    InetAddress类的使用（IP地址） 
+        实例化InetAddress的两个方法
+            getByName(String host)、getLocalHost()；
+        两个常用方法：
+            getHostName()、getHostAddress()；
+    端口号与IP地址的组合得出一个网络套接字：Socket；
+    TCP/IP协议簇
+        TCP：三次握手建立连接、点对点通信、可靠的、效率低；
+        UDP：不需要建立连接、可以广播发送、不可靠的、开销小速度快；
+    TCP网络编程的实现
+        服务器端：
+            确定打开的端口号（ServerSocket ss = new ServerSocket(int port)）
+            与客户端建立连接（Socket socket = ss.accept()）
+            接受输入流（InputStream is = socket.getInputStream()）
+            打印输出（int len; byte[] b = new byte[n]; while((len = is.read(b)) != -1) ）
+            关闭资源
+        客户端：
+            创建InetAddress对象（InetAddress inet = InetAddress.getByName("ip")）
+            创建Socket对象与服务器端打开的端口号建立连接（Socket socket = new Socket(InetAddress inet,int port)）
+            将客户端中的数据写出到输出流（OutputStream os = socket.getOutputStream()）
+            把需要传出的数据写出到输出流（os.write(str.getBytes())）
+            关闭资源
