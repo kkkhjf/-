@@ -8,18 +8,71 @@
   反射机制允许程序再执行期间借助于Reflection API取得任何类的内部信息，并能直接操作任意对象的内部属性及方法；
 	    加载完类后，在堆内存的方法区中就产生了一个class类型的对象，这个独享包含了完整的类的结构信息，我们可以通过这个对象看到类的结构；
 	    通过反射可以调用类的私有结构（构造器、方法和属性） 
-	关于java.lang.Class类的理解：
+    关于java.lang.Class类的理解：
 		  程序经过javac.exe命令后会生成一个或多个字节码文件（.class）结尾，接着使用java.exe命令对某个字节码文件进行解释运行，相当于将某个字节码文件加载到内存，此过程被称为类的加载。加载到内存中的类就是运行时类，
           此运行时类，就作为Class的一个实例（Class的实例就对相应着一个运行时类）；
 		  加载到内存中的运行时类，会缓存一定的时间。再次时间内，我们可以通过不同的方式获取此运行时类； 
 	Calss类的实例：
-      class的外部类、成员（成员内部类、静态内部类）、局部内部类、匿名内部类）、interface接口、数组（类型和维度一样就是同一个Class）、枚举类、注解、基本数据类型和void；类的加载过程
+      class的外部类、成员（成员内部类、静态内部类）、局部内部类、匿名内部类）、interface接口、数组（类型和维度一样就是同一个Class）、枚举类、注解、基本数据类型和void；类的	加载过程
 		  类的加载（将类的class文件读入内存并为之创建一个java.lang.Class对象，此过程由类的加载器实现）-类的连接（将类的二进制数据合并到jre中）-类的初始化（jvm负责对类进行初始化）
-           类的加载器：将class文件字节码内容加载到内存中，并将这些静态数据转换成方法区的运行时数据结构，然后在堆中生成一个代表这个类的java.lang.Class对象，作为方法区中类数据的访问入口；
+           类的加载器：将class文件字节码内容加载到内存中，并将这些静态数据转换成方法区的运行时数据结构，然后在堆中生成一个代表这个类的java.lang.Class对象，作为方法区中类	数据的访问入口；
                      引导类加载器：把Java核心类加载进内存
                      扩展类加载器：把lib下的扩展.jar包加载进内存
                      系统类加载器：把用户自定义的类加载进内存
           类缓存：标准的javeSE类加载器可以按要求查找类，一旦一个类被加载到类加载器中，它将维持加载一段时间；
-          
-      
-  
+    类加载器加载.properties配置文件
+    	Properties pros = new Properties();
+	ClassLoader classloader = 类名.class.getClassLoader();
+	InputStream is = classloader.getResourceAsStream("路劲");//默认是在Resource文件夹下
+	pros.load(is);
+    创建运行时对象（通过反射）
+    	//通过newInstance()创建对象
+    	Class<?> clazz = 类名.class;
+        类名 obj = clazz.newInstance();
+        newInstance()：调用此方法，创建对应的运行时类的对象。内部调用了运行时类的空参构造器（必须提供空参构造器且不能被private修饰）
+    创建运行时类的完整结构
+    	获取属性和方法
+	    getFields()：获取当前运行时类及其父类中声明为public访问权限的属性（返回Fields[]数组）；
+	    getFeclaredFields()：获取当前运行时类中声明的所有属性；（不包含父类中的声明，返回Fields[]数组）
+	    getModifiers()：获取属性/方法的权限修饰符；
+	    getType()：获取属性的数据类型；
+	    getName()：获取属性的名字；
+     	    getMethods()：获取运行时类及其父类中的public方法；
+	    getDeclaredMethod()：获取当前运行时类的所有方法（不包含父类中的方法）；
+	    getAnnotation()：获取当前运行类的注解（返回Annotation[]）
+	    getReturnType()：获取返回值类型(需要使用getName()得到String类型)
+	    getParameterTypes()：获取方法中的参数类型（返回Class[]数组）
+	    getExceptionType()：a获取当前运行类方法的异常类型（返回class[]数组）
+	获取构造器结构
+	    getConstructors()：获取当前运行时类中声明为public的构造器；
+	    getDeclaredConstructors()：获取当前运行时类中所有的构造器；
+	    其余方法和属性或方法中类似；
+	获取运行时类的父类
+	    getSuperclass()：获得运行时类的父类
+	    getGenericSupercalss()：获取运行时类带泛型的父类；
+	    获取带泛型父类的泛型：
+	    	获取运行时类的父类，再利用ParameterizedType进行类型转换，使用getActualTypeArguments()获得泛型名称；
+	获取运行时类的接口
+	    getInterface()：获取当前运行时类的接口；
+	获取当前运行时类的包
+	    getPackage()：获取当前运行时类的包信息；
+3、调用运行时类中指定的结构（属性、方法、构造器）
+    Class clazz = 类名.class；
+    类名 对象名 = （对象名）clazz.newInstance()；
+    获取指定的属性  
+    	方式一
+            getField(String name)：获取运行时类的特定属性（public）；
+	    set(Object obj,Object value)：设置当前属性的值；
+     	    get(Object obj)：获取当前属性的值；
+	方式二
+	    getDeclaredField(String name)：可以获取当前运行类的属性（private也可以）；
+	    setAccessible(boolean flag)：true表示当前属性可以访问，false表示当前属性不可访问；
+	    set/get
+    获取指定的方法
+        getDeclaredMethod(String name,Class<?>... params)：获取当前运行时类的方法
+	setAccessible(boolean flag)：true允许访问，false禁止访问
+	invoke(Object obj,Object... args)：调用方法，invoke的返回值即为调用方法中的返回值,invoke函数第一个参数写null/类.class及代表调用static方法；
+    调用指定的构造器
+    	getDeclaredConstract(Class<?>... params)：获取指定的构造器，指明构造器的形参列表；
+	setAccessible(boolean flag)：true允许访问，false禁止访问；
+	getdeclaredconstractor.newInstance(Class<?>... params)：调用构造器创建对象；
