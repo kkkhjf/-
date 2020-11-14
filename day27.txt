@@ -1,3 +1,51 @@
 1、动态代理
     代理设计模式
         使用一个代理将对象包装起来，然后用该代理对象取代原始对象，任何对原话是对象的调用都要通过代理。
+    静态代理
+        代理类和被代理类在编译之前就已经被确定了
+    动态代理
+        
+        
+        
+2、Java8新特性
+    Lambda表达式
+        Lambda是一个匿名函数，我们可以把Lambda表达式理解为是一段可以传递的代码（将代码像数据一样传递）
+    Lambda表达式的使用
+        举例：(o1,o2) -> Integer.compare(o1,o2);
+        格式：->：Lambda操作符 或 箭头操作符
+             ->左边：Lambda形参列表(接口中的抽象方法的形参列表)
+             ->右边：Lambda体(其实就是重写的抽象方法的方法体)
+        Lambda表达式的使用
+            格式一：无参，无返回值
+                Runnable r1 = () -> {System.out.println("我要去BJ")};
+            格式二：Lambda需要一个参数，但是没有返回值
+                Consumer<String> con1 = (String s) -> {System.out.println(s)};
+            格式三：数据类型可以省略，因为可由编译器推断得出，称为类型推断
+                Consumer<String> con2 = (s) -> {System.out.println(s)};s
+            格式四：Lambda若只需要一个参数时，参数的小括号可以省略
+                Consumer<String> con2 = s -> {System.out.println(s)};
+            格式五：Lambda需要两个或以上的参数，多条执行语句，并且可以有返回值
+                Consumer<String> con3 = (o1,o2) -> {System.out.println(o1);
+                                                    System.out.println(o2);
+                                                    return o1.compareTo(o2);}
+            格式六：当Lambda体只有一条语句时，return与大括号若有，都可以省略
+                Consumer<String> con3 = (o1,o2) -> o1.compareTo(o2);
+        Lambda表达式的本质：作为函数式接口的实例：
+    函数接口
+        如果一个接口中只声明了一个一个抽象方法，则此接口就被称为函数式接口，函数式接口的注解（@FunctionalInterface）；
+        所以以前用匿名类实现类表示的现在都可以用Lambda表达式来写；
+        Java内置四大核心函数式接口
+            （消费性接口）Consumer<T> void 对类型为T的对象应用操作，包含方法：void accept(T t)；
+            （供给型接口）Supplier<T> T 返回类型为T的对象，包含方法：T get()；
+            （函数型接口）Function<T,R> R 对类型为T的对象应用操作，并返回R类型的结果，包含方法：R apply(T t)；
+            （断定型接口）Predicate<T> boolean 确定类型为T的对象是否满足某约束，并返回boolean值，包含方法：boolean test(T t)；
+    方法引用
+        方法引用的使用：当要传递给Lambda体的操作，已经有实现的方法了，可以使用方法引用。
+        方法引用本质上就是Lambda表达式，而Lambda表达式作为函数式接口的实现，所以方法引用也是函数式接口的实例；
+        使用格式
+            类(或对象) :: 方法名
+        具体分为如下的三种情况：
+            对象 :: 非静态方法
+            类 :: 静态方法
+            类 :: 非静态方法
+        方法引用使用的要求：要求接口中的抽象方法的形参列表和返回值类型与方法引用的方法的形参列表和返回值类型相同；
