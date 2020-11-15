@@ -1,0 +1,135 @@
+1、Html和Css
+	Css：决定页面布局效果；
+	Html：决定页面其他内容；
+	JavaWeb是B/S结构（客户端：浏览器，服务器端：Web服务器），JavaSE是C/S结构；
+	网页三部分组成（内容、表现、行为）
+		内容：页面中的数据；
+		表现：内容在页面上的展示形式；
+		行为：页面中元素与输入设备之间的交互响应；
+	Html文件
+		通过标签来标记网页中的各个部分，网页文件本身也是一种文件，通过在文件中添加标记符，可以告诉浏览器如何显示文件的内容；
+		创建Html文件
+			创建一个JavaScript工程，再接着创建Html文件；
+		Html文件的编写规范
+			<!DOCTYPE html>  约束，声明
+			<html lang="en">   html标签表示html文件的开始，lang="en"表示语言种类，html标签中一般分为两部分，分别是head和body
+			<head>   表示头部信息，一般包括三部分：title标签，css样式，js代码
+			<meta charset="UTF-8">   表示当前页面使用UTF-8
+			<title>HJF</title>   表示标题
+			</head>
+			<body>   body标签是整个html页面显示的主体部分
+			hello,world!<!--页面内容
+			</body>   </xxx>表示标签的标记的范围
+			</html>
+		Html标签介绍
+			标签的格式
+				<标签名>封装的数据</标签名>
+				标签名不区分大小写
+				标签拥有自己的属性
+					基本属性：可以修改简单的样式效果，例如，bgcolor；
+					事件属性：可以直接设置事件响应后的代码，例如，onclick；
+				标签分为单标签和双标签
+					双标签：<p></p>
+					单标签：<br/>
+				标签语法
+					标签不能交叉使用；
+					标签必须正确关闭；
+					属性必须要有值，属性值必须加引号；
+					注释不能嵌套；
+				常用标签
+					font标签
+						规定文本的字体(face)、字体尺寸(size)、字体颜色(color)；
+				特殊字符
+					在页面中显式标签时需要使用到特殊字符，用来代替具有语法意义的字符；
+					常用的特殊字符
+						&lt; --> <
+						&gt; --> >
+						&nbsp --> Space
+						&amp; --> &
+						&quot --> "
+						&apos --> '
+				标题标签
+					<hx>标题x</hx>  1 <= x <= 6  x的大小决定着标题的大小；
+					align属性表示标题的位置left、right、center  居左、居右、居中；
+			超链接
+				<a></a>
+				href属性设置连接地址；
+				target属性设置哪个目标进行跳转  _self表示当前页面跳转  _blank表示打开新页面进行跳转；
+			列表标签
+				无序列表（表的前面不会加上序号）
+					<ul>
+						<li>内容</li>
+						<li>内容</li>
+					</ul>
+				有序列表（表的前面会加上序号）
+					<ol>
+						<li>内容</li>
+						<li>内容</li>
+					</ol>
+				ul是无序列表(type属性可以修改这个列表项前面的字母)  li是列表项	
+			img标签
+				<img src="路径"/>
+				img是图片标签，用来显示图片；
+				src属性可以设置图片的路径 ；
+				width和height属性表示图片的长宽； 
+				border属性表示边框，数字越大边框越粗；
+				alt属性设置当指定路径找不到图片时，用来替代现实的文本内容；
+				javaweb中的路径
+					绝对路径
+						正确格式：http://ip.port/工程名/资源路径
+						错误格式：盘符:/目录/文件名  （JavaSE的表示方法）
+					相对路径
+						.	        表示当前文件所在的目录
+						..	        表示当前文件所在的上一级目录
+						.文件名 	表示当前文件所在目录的文件，相当于 ./文件名
+			表格标签
+				<table></table>  表格标签
+					border 设置表格标签
+					width  设置表格宽度
+					height 设置表格高度
+					align  设置表格相对于页面的对齐方式
+					cellspacing 设置单元格间距
+					
+				<tr></tr>  行标签
+				<th></th>  表头标签
+				<td></td>  单元格标签
+					align 设置单元格文件对其方式
+					colspan 设置跨列
+					rowspan 设置跨行
+			了解iframe框架标签（内嵌窗口）
+				iframe标签它可以在html页面上打开一个小窗口，去加载一个单独的页面，iframe标签是双标签；
+					iframe标签和a标签组合使用的步骤：
+						在iframe标签中使用name属性定义一个名称
+						在a标签中的target属性上设置iframe的name的属性值
+							<iframe  width="500" height="200" name="test"></iframe>
+							ul>
+								<li><a href="test.html" target="test">iframe标签</a></li>
+							</ul>
+			表单显示
+				<form></form> 表单标签
+					<input />输入框 
+						text 文本框
+							value设置默认显示内容；
+						password 密码框
+							value设置默认显示内容；
+						radio 单选框 
+							name属性可以对所有的单选框分组
+							check属性表示默认选择当前单选框（只能添加给一个单选框）
+						checkbox 多选框
+							check属性表示默认选择当前多选框（可以添加给多个多选框）
+						reset 重置按钮
+							value属性更改按钮名称
+						submit 提交按钮
+							value属性更改按钮名称
+						hidden 隐藏域，当我们要发送某些信息，而这些信息不需要用户参与，就可以通过隐藏域（提交时同样发送给服务器）
+						button 按钮
+							value设置默认显示内容；
+						file 文件上传域
+							
+							
+					<select></select>下拉列表框
+						<option></option> 下拉列表框中的选项
+							selected属性selected默认为选中状态
+					<textarea></textarea>（起始标签和结束标签中的内容是默认值）
+						rows属性设置可见的行数
+						cols属性设置可见的列数
