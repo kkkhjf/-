@@ -1,24 +1,134 @@
-1、一维数组
-    概念：多个相同类型按一定顺序排列的集合；
-    一维数组声明：数据类型[] 变量名 = new 数据类型[数组长度]；
-    一维数组初始化：数据类型[] 变量名 = new 数据类型[数组长度]{初始化}
-    数组的索引从0开始，按照索引号指定的调用对应的数组元素；
-    数组在被声明后系统会默认赋值（整型默认为0，浮点型默认为0.0，字符型数组默认为0，布尔型默认为false，字符串默认为null）
-    数组的内存解析：数组元素存放在堆中，数组名放在栈中（大概意思）；
-    注：数组是引用类型、初始化后长度不能改变且确定。
-    
-2、Eclipse的使用
-    注意配置基础的工作区，添加工程时要注意字符码的一致性（最好统一为UTF-8）；
-    详细见“尚硅谷”。
-    
-3、二维数组
-    二维数组可以说是由数组构成的数组；
-    二维数组声明：数据类型[][] 变量名 = new int[变量名1][变量名2];
-                 数据类型[][] 变量名 = new int[变量名][];
-    二维数组左边为行，右边为列；
-    二维数组也可以是不规则数组，因为本质上还是一维数组；
-    二维数组的长度指的是第一次指向的一维数组长度；
-    二维数组的默认值（int-> 0,floate -> 0.0,string -> null），第一个数组的默认是地址值(数据类型[][] 数组名 = 数据类型[变量名][]
-        这样声明的二维数组第一个数组默认值是null，第二个数组为空指针异常)。
-        
-4、关于数组的简单算法
+1、JavaScript介绍
+	JavaScript语言诞生主要是完成页面地数据验证，因此它运行在客户端，需要运行浏览器来解析执行JavaScript代码；
+	JavaScript特点：
+		交互性（信息的动态交互）
+		安全性（不允许直接访问本地硬盘）
+		跨平台性（可以解释JS的浏览器都可以执行）
+	JS是弱类型（类型可变），Java是强类型（定义变量的时候类型已经确定）
+2、JavaScript和HTML代码的结合方式
+	第一种方式
+		只需要在<head>标签中或<body>标签中，使用script标签来书写JavaScript代码；
+			<script type="text/javascript">
+				//alert是JavaScript语言提供的
+				alert("Hello JavaScript!");
+			</script>
+	第二种方式
+		使用script标签引入单独的JavaScript代码文件
+			<script type="text/javascript" src="hello.js">
+				//src属性可以引入js文件，可以是相对路径也可以是绝对路径
+			</script>
+		同一个<script>标签内可以定义js代码，也可以用来引入js文件，但是两个功能只能二选一使用；
+3、JavaScript变量
+	JavaScript变量类型
+		数值类型：number
+		字符串类型：string
+		对象类型：object
+		布尔类型：boolean
+		函数类型：function
+	JavaScript里的特殊值
+		undefined：未定义，所有js变量为赋于初始值的时候，默认值都是undefined
+		null：空值
+		NAN：全程（Not a Number）非数值
+	JavaScript中定义变量格式
+		var 变量名
+		var 变量名 = 值；
+		<script type="text/javascript">
+			var i;
+			i = 16;
+			//typrof()返回变量的数据类型
+			alert(typeof(i));
+			i = "aaa";
+			//JavaScript弱类型的体现
+			alert(typeof(i));
+			var j = 10;
+			//结果为NaN
+			alert(i*j);
+		</script>
+	JavaScript关系运算
+		< <= > >= !=
+		等于（==）：简单的字面值的比较（会自动进行数据类型转换）；
+		全等于（===）：除了字面值比较外还会比较数据类型；
+	JavaScript逻辑运算
+		且运算：&&
+			当表达式全为真的时候，返回最后一个表达式的值；
+			当表达式中，有一个为假的时候，返回第一个为假的表达式的值；
+		或运算：||
+			当表达式全为假时返回最后一个表达式的值；
+			只要有一个表达式为真，就返回第一个为真的表达式的值；
+		非运算：！
+		JavaScript中所有类型的变量都可以作为boolean类型的变量使用；
+		0、null、undefined、""（空串，有空格不算空串）都认为是false；
+		JavaScript中&&和||都是短路运算；
+	JavaScript数组
+		数组的定义
+			var 数组名 = [];//空数组；
+			var 数组名 = [1,"abc",true];//定义时赋值
+		JavaScript中的数组只要我们通过数组下标赋值，那么最大的下标值就会自动的给数组做扩容（赋值时才扩容）；
+	JavaScript函数
+		使用格式
+			第一种方式：使用function关键字来定义函数
+				function 函数名(形参列表){
+					函数体;
+				}
+				在函数体内直接使用return语句即可定义带有返回值的函数，无需声明函数类型；
+				列数列表中不需要声明参数的类型；
+			第二种方式：
+				var 函数名 = function(形参列表){
+					函数体;
+				}
+				返回值同上；
+		JavaScript不允许函数重载；
+	函数的arguements隐形参数（只在function函数内）
+		隐形参数在function函数内不需要定义，但却可以直接用来获取所有参数的变量；
+		实例：
+			function fun(){
+				alert("无参函数演示。");
+				for(var i = 0;i < arguments.length;i++){//遍历数组（这里遍历的是隐藏数组）
+					alert(arguments[i]);
+				}
+			}
+			fun(1,2,3,4,5,6,7,true);//调用隐藏参数的函数
+	Object形式自定义对象
+		对象的定义
+			var 变量名 = new Object(); //对象实例
+			变量名.属性名 = 值; //定义一个属性
+			变量名.函数名 = function(){} //定义一个函数
+			实例：
+				var obj = new Object();
+				//对象属性的定义
+				obj.aaa = "qwer";
+				obj.bbb = 123;
+				obj.ccc = true;
+
+				obj.fun = function (flag) {//函数的定义
+					obj.ccc = flag;
+					if(obj.ccc){
+						alert(obj.aaa);
+						alert(obj.bbb);
+					}else{
+						alert(obj.ccc);
+					}
+				}
+				obj.fun(true); //函数的调用
+	大括号形式的自定义对象
+		var 变量名 = {
+			属性名: 值,
+			属性名: 值, //定义属性，属性名：值后面接逗号
+			函数名: function(){} //定义一个函数
+		};
+		具体实例同上；
+	JavaScript中的事件
+		电脑输入设备与页面进行交互的响应，我们称之为事件；
+		常用事件
+			onload 		加载完成事件，常用于页面js代码初始化操作
+			onclick 	单击事件，常用于按钮的点击响应操作
+			onblur		失去焦点事件，常用于输入框失去焦点后验证器输入内容是否合法
+			onchange	内容发生改变事件，常用于下拉列表和输入框发生改变后操作
+			onsubmit	表单提交事件，常用于表单提交前验证所有表单项是否合法
+		事件的注册
+			告诉浏览器，当事件响应后要执行哪些操作代码，叫事件注册或事件绑定
+			静态注册事件
+				通过HTML标签的事件属性直接赋于事件响应后的代码，这种方式我们叫静态注册；
+			动态注册事件
+				先通过js代码得到标签的dom对象，然后通过dom对象.事件名 = function(){}这种形式赋予事件响应后的代码叫动态注册；
+			
