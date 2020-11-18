@@ -1,0 +1,179 @@
+1、JavaScript中的事件
+	常用事件
+			onload 		加载完成事件，常用于页面js代码初始化操作
+			
+				window.onload = function () {
+					alert("动态注册的onload事件");
+				}
+				
+			onclick 	单击事件，常用于按钮的点击响应操作
+			
+				window.onclick = function (){
+					//获取对象
+					/**
+					* @type {HTMLElement}
+					* document是JavaScript语言提供的一个对象
+					* getElementById()通过id获取标签对象
+					*/
+					var btnObj = document.getElementById("btn01");
+					//通过标签对象.事件名 = function(){}
+						btnObj.onclick = function (){
+						alert("动态创建的onclick事件");
+					}
+				}
+				
+				<button id="byn01">按钮</button>
+			
+			onblur		失去焦点事件，常用于输入框失去焦点后验证器输入内容是否合法
+			
+				 //静态注册失去焦点事件
+				function onBlurFun(){
+					console.log("静态注册失去焦点事件");
+				}
+				//动态注册焦点事件
+				window.onload = function(){
+					var pwdObj = document.getElementById("pwd01");
+
+					pwdObj.onblur = function () {
+						console.log("动态注册失去焦点事件");
+					}
+				}
+			
+			onchange	内容发生改变事件，常用于下拉列表和输入框发生改变后操作
+			
+				//静态注册onchange事件
+				function onChange (){
+					alert("国籍改变");
+				}
+				//动态注册onchange事件
+				window.onchange = function (){
+					var ocObj = document.getElementById("onchange01");
+					ocObj.onchange = function (){
+					alert("国籍改变了");
+					}
+				}
+				
+				<!--静态注册onchange事件-->
+				<select onchange="onChange()">
+					<option>--请选择国籍</option>
+					<option>中国</option>
+					<option>美国</option>
+					<option>英国</option>
+				</select>
+				<!--动态注册onchange事件-->
+				<select id="onchange01">
+					<option>--请选择国籍</option>
+					<option>中国</option>
+					<option>美国</option>
+					<option>英国</option>
+				</select>
+			
+			onsubmit	表单提交事件，常用于表单提交前验证所有表单项是否合法
+			
+				//静态注册表单提交事件
+				function onSubmit(){
+					//提交时要验证所有表单项是否合法，如果不合法就会阻止提交
+					alert("静态注册表单提交---发现不合法");
+					return false;//数据异常时，组织表单提交
+				}
+				//动态注册表单提交操作
+				window.onsubmit = function (){
+					var osObj = document.getElementById("onsubmit01");
+					osObj.onsubmit = function (){
+						alert("动态注册表单提交---不合法");
+						return false;
+					}
+				}
+				<!--静态注册表达提交-->
+				<form action="http://localhost:8080" method="get" onsubmit="return onSubmit()">
+					<input type="submit" value="静态注册表单提交"/>
+				</form>
+				<!--动态注册表单提交-->
+				<form action="http://localhost:8080" method="get" id="onsubmit01">
+					<input type="submit" value="动态注册表单提交" />
+				</form>
+			
+		事件的注册
+			告诉浏览器，当事件响应后要执行哪些操作代码，叫事件注册或事件绑定
+			静态注册事件
+				通过HTML标签的事件属性直接赋于事件响应后的代码，这种方式我们叫静态注册；
+			动态注册事件
+				先通过js代码得到标签的dom对象，然后通过dom对象.事件名 = function(){}这种形式赋予事件响应后的代码叫动态注册；
+		
+2、DOM模型
+	DOM（文档对象模型）
+		把文档（html页面）中的标签，属性，文本等转化成对象来管理；
+	Document对象
+		Document管理了所有的HTML文档内容；
+		Document是一种树形结构的文档，有层级关系；
+		Document把所有的标签都对象化；
+		开发人员可以通过Document访问所有的标签对象；
+
+3、正则表达式
+	创建方式一
+		var patt = new RegExp("内容");
+	创建方式二
+		var patt = /内容/;
+	正则表达式属性
+		a$：字符串必须是a结尾；
+		a{x,y}：字符串是否包含x个连续的a；注：/^a{x,y}$/表示字符串从头到尾必须完全匹配
+		a+：字符串是否包含至少一个a；
+		a?：字符串是否包含0个或一个a；
+		a{x}：字符串是否包含x个连续的a；
+		a{x,}：字符串是否包含至少x个连续的a；
+		\w：字符串是否包含字母、数字和下划线；
+		^a：字符串必须以a开头；
+
+4、验证消息显示
+		获取span标签的对象；
+		使用innerHTNML属性对span标签对象的内容进行修改；
+		实例：
+			var useridspanobj = document.getElementById("useridspan");
+			useridspanobj.innerHTML = "用户名不合法";（字符串中也可以直接写标签代码useridspanobj.innerHTML = "<img src=\"路径\">";）
+			<span id="useridspan" style="color:red"></span>
+
+5、getElementByName
+	getElementsByName()根据指定的属性查询返回多个标签的对象集合，这个集合跟数组一样，且集合中的顺序是页面中从上到下的顺序；
+	实例：
+		<input type="checkbox" name="hobby" value="cpp" />C++
+		<input type="checkbox" name="hobby" value="python" />Python
+		<input type="checkbox" name="hobby" value="java" />Java
+		<br/>
+		<button onclick="checkedall()">全选</button>
+		<button onclick="checkednon()">全不选</button>
+		<button onclick="checkedrev()">反选</button>
+		
+		function checkedall(){
+            var obj = document.getElementsByName("hobby");
+            for (var i = 0; i < obj.length; i++) {
+                obj[i].checked = true;
+            }
+        }
+
+6、getElementByTagName
+	当在html页面中的标签既没有提供id也没有提供name也可以通过标签名来获取标签的对象，且返回的也是一个集合；
+	实例同上：
+		function checkedall(){
+            var obj = document.getElementsByTagName("input");
+            for (var i = 0; i < obj.length; i++) {
+                obj[i].checked = true;
+            }
+        }
+
+7、Document对象的三个查询方法
+	如果有id属性优先使用getElementById方法来进行查询；
+	如果没有id属性，优先使用getElementByName方法进行查询；
+	如果id和name属性都没有则使用getElementByTagName方法进行查询；
+	注：以上三个方法一定要在页面加载完成之后执行，才能查询到标签对象
+	
+8、节点的常用属性和方法
+	节点就是标签对象
+	常用的方法
+		getElementByTagName()：获取当前指定签名的孩子节点；
+		appendChild(oChildNode)：添加一个子节点，oChildNode就是要添加的子节点；
+	属性
+		childNodes：获取当前节点的所有子节点；
+		firstChild：获取当前节点的第一个子节点；
+		lastChild：获取当前节点的最后一个子节点；
+		parentNode：获取当前节点的父节点；
+		
