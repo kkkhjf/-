@@ -1,0 +1,77 @@
+1、jQuery事件操作
+	$(function(){})和window.onload = function(){}的区别
+	
+	他们的出发条件
+		jQuery的页面加载完成之后的浏览器的内核解析完也买你的标签创建好Dom对象之后就会马上执行； 
+		原生js的页面加载完成之后，除了要等浏览器内核解析完标签创建好Dom对象，还要等标签显示时需要的内容加载完成；
+	他们的触发顺序
+		jQuery页面加载完成后先执行；
+		原生js的页面加载完成之后；
+	他们执行的次数
+		原生js的页面加载完成之后，只会执行最后一次的赋值函数；
+		jQuery的页面加载完成之后是全部把注册的function函数，依次顺序全部执行；
+2、jQuery中常用的事件处理方法
+	click()		绑定单击事件，以及触发单击事件
+		$(function (){
+            $("h5").click(function (){
+                alert("<h5>的click绑定功能");//绑定功能
+            });
+            $("button").click(function (){
+                $("h5").click();//触发功能
+            });
+        });
+	mouseover()	鼠标移入事件	
+	mouseout()	鼠标移出事件
+		$("h5").mouseover(function (){
+                console.log("I'm come.");
+            });
+            $("h5").mouseout(function (){
+                console.log("I'm out.");
+            });
+	bind()		可以给一个元素一次性绑定一个或多个事件
+		$("h5").bind("click mouseover mouseout",function (){//第一个参数中多个元素之间用空格分隔
+                console.log("这是bind绑定的多个事件。")
+            });
+	one()		使用上和bind一样，但是事件只能被运行一次	
+		$("h5").one("click mouseover mouseout",function (){
+                console.log("这是one绑定的多个事件。")
+            });
+	live()		可以用来绑定选择器匹配的所有元素的事件，哪怕这个元素是后面动态创建出来的；
+		$("h5").live("click",function (){
+                alert("h5单击事件，live绑定。");
+            });
+        $("<h5 class = 'head'>什么是jQuery？</h5>").appendTo("div");
+	unbind()	跟bind()方法相反的操作，解除事件的绑定
+		$("h5").unbind("click mouseover");
+3、事件的冒泡
+	父子元素同时监听同一个事件，当触发子元素的事件时，同一个事件也被传递到父元素的事件里进行响应；
+	如何阻止事件冒泡
+		只需要在子元素内添加return false;即可；
+
+4、JavaScript事件对象
+	封装有触发的事件信息的一个JavaScript对象，重点关注如何获取事件的对象以及使用它；
+	获取事件的对象
+		在给元素绑定事件的时候，在事件的function(event)参数列表中添加一个参数，这个参数名，我们习惯取event，
+			这个event就是JavaScript传递参事件处理函数的事件对象；
+		原生页面获取对象
+				window.onload = function (){
+				document.getElementById("aaa").onclick = function (){
+					console.log(event);
+				}
+			}
+		jQuery代码获取对象
+				window.onload = function (){
+				document.getElementById("aaa").onclick = function (){
+					console.log(event);
+				}
+			}
+		bind绑定多个事件，并确定触发的是哪个对象
+				 $("#aaa").bind("mouseover mouseout",function (event){
+                if(event.type == "mouseover"){
+                    console.log("鼠标移入");
+                }
+                if(event.type == "mouseout"){
+                    console.log("鼠标移出");
+                }
+            });
+			
