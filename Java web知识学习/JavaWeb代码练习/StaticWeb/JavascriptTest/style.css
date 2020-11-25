@@ -1,0 +1,41 @@
+body{
+    width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+button{
+    width: 300px;
+    margin-bottom: 10px;
+}
+
+#btnList{
+    float: left;
+}
+
+#total{
+    width: 450px;
+    float: left;
+}
+
+ul{
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+li{
+    display: inline;
+    list-style-type: none;
+    padding: 5px 5px;
+    border: 1px solid black;
+    width: 60px;
+    height: 40px;
+    background-color: aquamarine;
+}
+.inner{
+    border: 1px solid black;
+    margin-bottom: auto;
+    margin-top: auto;
+}
+

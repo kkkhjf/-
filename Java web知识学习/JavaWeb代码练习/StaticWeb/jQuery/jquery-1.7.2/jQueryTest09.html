@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>jQueryTest09</title>
+    <style type="text/css>">
+        div{
+            width: 200px;
+            height: 30px;
+            border: 1px solid black;
+        }
+        #bbb{
+            width: 120px;
+            height: 10px;
+            border: 1px solid black;
+        }
+    </style>
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript">
+        // $(function (){
+        //     $("#content").click(function (){
+        //         alert("父元素触发");
+        //     });
+        //
+        //     $("span").click(function (){
+        //         alert("子元素触发");
+        //         return false;
+        //     });
+        //
+        // });
+        //原生页面获取对象
+        // window.onload = function (){
+        //     document.getElementById("aaa").onclick = function (){
+        //         console.log(event);
+        //     }
+        // }
+        //jQuery代码获取对象
+        // $(function (){
+        //     // $("#aaa").click(function (){
+        //     //     console.log(event);
+        //     // });
+        //     $("#aaa").bind("mouseover mouseout",function (event){
+        //         if(event.type == "mouseover"){
+        //             console.log("鼠标移入");
+        //         }
+        //         if(event.type == "mouseout"){
+        //             console.log("鼠标移出");
+        //         }
+        //     });
+        // });
+
+    </script>
+</head>
+<body>
+<!--    <div id="content">-->
+<!--        外层div元素-->
+<!--        <span>-->
+<!--            内层span元素-->
+<!--        </span>-->
+<!--    </div>-->
+
+<!--    <div id="msg"></div>-->
+<!--    <br/><br/>-->
+<!--    <a href="http://www.hao123.com">WWW.HAO123.COM</a>-->
+    <div id="aaa" style="border: 1px solid black; width: 200px;height: 50px">11</div>
+<br/>
+    <div id="bbb" style="border: 1px solid black;width: 100px;height: 20px">11</div>
+</body>
+</html>

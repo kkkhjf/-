@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>jQueryTest04</title>
+    <style type="text/css">
+        table{
+            margin-left: 500px;
+            margin-top: auto;
+        }
+        div{
+            width: 100px;
+            height: 260px;
+        }
+        div.whiteborder{
+            border: 2px white solid;
+        }
+        div.redDiv{
+            background-color: red;
+        }
+        div.blueBorder{
+            border: 5px blue solid;
+        }
+    </style>
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript">
+        $(function (){
+            var obj = $("table").find("div:first");
+            var o = $("div:first");
+            //实现addClass()方法
+            $("#btn01").click(function (){
+                //addClass()
+                //要添加多个属性中间用空格分开
+                obj.addClass("redDiv");
+            });
+            //实现removeClass()方法
+            $("#btn02").click(function (){
+                obj.removeClass("redDiv");
+            });
+            //实现toggleClass()方法
+            $("#btn03").click(function (){
+                obj.toggleClass("redDiv");
+            });
+            $("#btn04").click(function (){
+                var pos = obj.offset();
+                console.log(pos);
+                obj.offset({//通过offset()方法对div框进行坐标地重新设置
+                   top:100,
+                   left:200
+                });
+            });
+
+        });
+    </script>
+</head>
+<body>
+    <table>
+        <tr>
+            <td>
+                <div class="border">
+                </div>
+            </td>
+            <td>
+                <div class="btn">
+                    <input type="button" value="addClass()" id="btn01" /><br/>
+                    <input type="button" value="removeClass()" id="btn02" /><br/>
+                    <input type="button" value="toggleClass()" id="btn03" /><br/>
+                    <input type="button" value="offset()" id="btn04" />
+                </div>
+            </td>
+        </tr>
+    </table>
+
+
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JsHJF</title>
+    <script type="text/javascript">
+        // var i;
+        // i = 16;
+        //typrof()返回变量的数据类型
+        // alert(typeof(i));
+        // i = "aaa";
+        //JavaScript弱类型的体现
+        //alert(typeof(i));
+        //var j = 10;
+        //结果为NaN
+        //alert(i*j);
+        //定义数组
+        // var arr = [];
+        // arr[0] = 10;
+        // arr[2] = true;
+        // alert(arr[1]);
+        //隐形参数的使用
+        // function fun(){
+        //     alert("无参函数演示。");
+        //     for(var i = 0;i < arguments.length;i++){//遍历数组（这里遍历的是隐藏数组）
+        //         alert(arguments[i]);
+        //     }
+        // }
+        // fun(1,2,3,4,5,6,7,true);//隐藏参数
+        //对象的定义
+        // var obj = new Object();
+        // //对象属性的定义
+        // obj.aaa = "qwer";
+        // obj.bbb = 123;
+        // obj.ccc = true;
+        //
+        // obj.fun = function (flag) {//函数的定义
+        //     obj.ccc = flag;
+        //     if(obj.ccc){
+        //         alert(obj.aaa);
+        //         alert(obj.bbb);
+        //     }else{
+        //         alert(obj.ccc);
+        //     }
+        // }
+        // obj.fun(true); //函数的调用
+        //onload事件动态注册是固定写法
+        // window.onload = function () {
+        //     alert("动态注册的onload事件");
+        // }
+
+        //静态注册onclick事件
+        // function clickFun(){
+        //     alert("静态注册onclick事件！");
+        // }
+        // //动态注册onclick事件
+        // window.onclick = function (){
+        //     //获取对象
+        //     /**
+        //      * @type {HTMLElement}
+        //      * document是JavaScript语言提供的一个对象
+        //      * getElementById()通过id获取标签对象
+        //      */
+        //    var btnObj = document.getElementById("btn01");
+        //    //通过标签对象.事件名 = function(){}
+        //     btnObj.onclick = function (){
+        //         alert("动态创建的onclick事件");
+        //     }
+        // }
+
+        //静态注册失去焦点事件
+        // function onBlurFun(){
+        //     console.log("静态注册失去焦点事件");
+        // }
+        // //动态注册焦点事件
+        // window.onload = function(){
+        //     var pwdObj = document.getElementById("pwd01");
+        //
+        //     pwdObj.onblur = function () {
+        //         console.log("动态注册失去焦点事件");
+        //     }
+        // }
+
+        //静态注册onchange事件
+        // function onChange (){
+        //     alert("国籍改变");
+        // }
+        //动态注册onchange事件
+        // window.onchange = function (){
+        //     var ocObj = document.getElementById("onchange01");
+        //
+        //     ocObj.onchange = function (){
+        //         alert("国籍改变了");
+        //     }
+        // }
+
+        // //静态注册表单提交事件
+        // function onSubmit(){
+        //     //提交时要验证所有表单项是否合法，如果不合法就会阻止提交
+        //     alert("静态注册表单提交---发现不合法");
+        //     return false;//数据异常时，组织表单提交
+        // }
+        // //动态注册表单提交操作
+        // window.onsubmit = function (){
+        //     var osObj = document.getElementById("onsubmit01");
+        //     osObj.onsubmit = function (){
+        //         alert("动态注册表单提交---不合法");
+        //         return false;
+        //     }
+        // }
+
+
+        
+    </script>
+</head>
+<body>
+<!--&lt;!&ndash; 静态注册onclick事件 &ndash;&gt;-->
+<!--<button onclick="clickFun()">按钮1</button>-->
+<!--&nbsp;&nbsp;-->
+<!--&lt;!&ndash; 动态注册onclick事件 &ndash;&gt;-->
+<!--<button id="btn01">按钮2</button>-->
+<!--静态注册onblur事件-->
+<!--用户名：<input type="text" onblur="onBlurFun()" /><br/>-->
+<!--动态注册onblur事件-->
+<!--密码：<input type="text" id="pwd01" />-->
+<!--静态注册onchange事件-->
+<!--<select onchange="onChange()">-->
+<!--    <option>&#45;&#45;请选择国籍</option>-->
+<!--    <option>中国</option>-->
+<!--    <option>美国</option>-->
+<!--    <option>英国</option>-->
+<!--</select>-->
+<!--动态注册onchange事件-->
+<!--<select id="onchange01">-->
+<!--    <option>&#45;&#45;请选择国籍</option>-->
+<!--    <option>中国</option>-->
+<!--    <option>美国</option>-->
+<!--    <option>英国</option>-->
+<!--</select>-->
+<!--静态注册表达提交-->
+<!--<form action="http://localhost:8080" method="get" onsubmit="return onSubmit()">-->
+<!--    <input type="submit" value="静态注册表单提交"/>-->
+<!--</form>-->
+<!--动态注册表单提交-->
+<!--<form action="http://localhost:8080" method="get" id="onsubmit01">-->
+<!--    <input type="submit" value="动态注册表单提交" />-->
+<!--</form>-->
+</body>
+</html>

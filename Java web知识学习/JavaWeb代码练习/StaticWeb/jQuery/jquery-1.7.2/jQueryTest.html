@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>jQueryTest</title>
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript">
+        //全选，全不选利用过滤器实现
+        $(function (){
+            //全选单击事件
+           $("#btn01").click(function (){
+              var obj = $(":checkbox");
+               for (var i = 0; i < obj.length; i++) {
+                   obj[i].checked = true;
+               }
+           });
+           //全不选单击事件
+            $("#btn02").click(function (){
+               var obj = $(":checkbox");
+                for (var i = 0; i < obj.length; i++) {
+                    obj[i].checked = false;
+                }
+            });
+            //反选单击事件
+            $("#btn03").click(function (){
+               var obj = $(".sport");
+                for (var i = 0; i < obj.length; i++) {
+                    obj[i].checked = !(obj[i].checked);
+                }
+                var total = obj.length;
+                var count = $(":checkbox[class='sport']:checked").length;
+                if(count == total){
+                    $("#checked01")[0].checked = true;
+                }else{
+                    $("#checked01")[0].checked = false;
+                }
+            });
+            //提交单击事件
+            $("#btn04").click(function () {
+                var obj = $(":checkbox[class='sport']:checked");
+                for (var i = 0; i < obj.length; i++) {
+                    alert(obj[i].value);
+                }
+            });
+
+            //全选/全不选复选框
+           $("#checked01").click(function (){
+               var obj = $(".sport");
+               // for (var i = 0; i < obj.length; i++) {
+               //     obj[i].checked = this.checked;
+               // }
+               if(this.checked){
+                   for (var i = 0; i < obj.length; i++) {
+                       obj[i].checked = true;
+                   }
+               }else{
+                   for (var i = 0; i < obj.length; i++) {
+                       obj[i].checked = false;
+                   }
+               }
+           });
+            //给每个复选框添加单击事件
+           $(":checkbox[class='sport']").click(function (){
+               var total = $(".sport").length;
+               var count = $(":checkbox[class='sport']:checked").length;
+
+               if(total == count){
+                   $("#checked01")[0].checked = true;
+               }else {
+                   $("#checked01")[0].checked = false;
+               }
+           });
+        });
+    </script>
+</head>
+<body>
+    你的爱好是？<input type="checkbox" id="checked01" value="c0"/> 全选/全不选<br/>
+    <input type="checkbox" class="sport" value="足球"/>足球&nbsp;
+    <input type="checkbox" class="sport" value="篮球"/>篮球&nbsp;
+    <input type="checkbox" class="sport" value="羽毛球"/>羽毛球&nbsp;
+    <input type="checkbox" class="sport" value="乒乓球"/>乒乓球&nbsp;<br/>
+    <button id="btn01">全 选</button>
+    <button id="btn02">全不选</button>
+    <button id="btn03">反选</button>
+    <button id="btn04" type="submit">提交</button>
+</body>
+</html>

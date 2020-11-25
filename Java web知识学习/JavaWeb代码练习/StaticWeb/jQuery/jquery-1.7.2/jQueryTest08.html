@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>jQueryTest08</title>
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript">
+        $(function (){
+            // $("h5").click(function (){
+            //     alert("<h5>的click绑定功能");//绑定功能
+            // });
+            // $("button").click(function (){
+            //     $("h5").click();//触发功能
+            // });
+            // $("h5").mouseover(function (){
+            //     console.log("I'm come.");
+            // });
+            // $("h5").mouseout(function (){
+            //     console.log("I'm out.");
+            // });
+            // $("h5").bind("click mouseover mouseout",function (){
+            //     console.log("这是bind绑定的多个事件。");
+            // });
+            // $("h5").one("click mouseover mouseout",function (){
+            //     console.log("这是one绑定的多个事件。")
+            // });
+            // $("h5").unbind("click mouseover");
+            // $("h5").live("click",function (){
+            //     alert("h5单击事件，live绑定。");
+            // });
+
+            $("<h5 class = 'head'>什么是jQuery？</h5>").appendTo("div");
+        });
+    </script>
+</head>
+<body>
+    <div style="background-color: aquamarine; width: 300px;">
+        <h5>单击事件</h5>
+    </div>
+    <button>按钮</button>
+</body>
+</html>

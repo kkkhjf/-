@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>jQueryTest05</title>
+    <link rel="stylesheet" href="style.css" />
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript">
+        //动画---淡入淡出
+        $(function (){
+            //显示show()
+            $("#btn01").click(function (){
+                $("#div1").show(1000,function (){
+                    alert("show动画完成");
+                });
+            });
+            //隐藏hide()
+            $("#btn02").click(function (){
+                $("#div1").hide(1000,function (){
+                    alert("hide动画完成");
+                });
+            });
+            //实现切换toggle()
+            $("#btn03").click(function (){
+                $("#div1").toggle(500,function (){
+                    alert("toggle动画完成");
+                });
+            });
+            //淡入fadeIn()
+            $("#btn04").click(function (){
+                $("#div1").fadeIn();
+            });
+            //淡出fadeOut()
+            $("#btn05").click(function (){
+                $("#div1").fadeOut();
+            });
+            //指定时长内将透明度修改到指定的值
+            $("#btn06").click(function (){
+                $("#div1").fadeTo(2000,0.7,function (){
+                    alert("OK");
+                });
+            });
+            //淡入淡出切换
+            $("#btn07").click(function (){
+                $("#div1").fadeToggle();
+            });
+        });
+    </script>
+
+</head>
+<body>
+    <table style="...">
+        <tr>
+            <td><button id="btn01">显示show()</button></td>
+        </tr>
+        <tr>
+            <td><button id="btn02">隐藏hide()</button></td>
+        </tr>
+        <tr>
+            <td><button id="btn03">显示/隐藏切换toggle()</button></td>
+        </tr>
+        <tr>
+            <td><button id="btn04">淡入fadeIn()</button></td>
+        </tr>
+        <tr>
+            <td><button id="btn05">淡出fadeOut()</button></td>
+        </tr>
+        <tr>
+            <td><button id="btn06">淡化到fadeTo()</button></td>
+        </tr>
+        <tr>
+        <td><button id="btn07">淡化切换fadeToggle()</button></td>
+        </tr>
+    </table>
+    <div id="div1">
+        jQuery动画定义了很多种动画效果，可以很方便的使用这些动画效果
+    </div>
+</body>
+</html>

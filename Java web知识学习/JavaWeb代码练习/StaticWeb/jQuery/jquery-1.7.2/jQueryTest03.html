@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>jQueryTest03</title>
+    <link rel="stylesheet" type="text/css" href="jQueryTest03Css.css" />
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript">
+        $(function (){
+            /**
+             * 动态地创建和使用表格
+             *
+             * @returns {boolean}
+             */
+            //创建一个用于复用的删除函数
+            var deletefun = function (){
+                if(confirm("确定要删除"+ ($(this).parent()).parent().find("td:first").text()+"？")){
+                    ($(this).parent()).parent().remove();
+                }
+
+                return false;
+            }
+
+
+
+            //给Submit按钮绑定事件
+            $("#addEmpButton").click(function (){
+
+                var name = $("#empName").val();
+                var email = $("#email").val();
+                var salary = $("#salary").val();
+
+                var objtr = $("<tr>"+
+                    "<td>"+name+"</td>"+
+                    "<td>"+email+"</td>"+
+                    "<td>"+salary+"</td>"+
+                    "<td><a href=\"deleteEmp?id=004\">Delete</a></td>"+
+                "</tr>");
+                objtr.appendTo($("#employeeTable"));
+
+                //给最新添加的a标签补绑单击事件，再进行删除操作
+                objtr.find("a").click(deletefun);
+            });
+            //给删除地段绑定单击事件
+            $("a").click(deletefun);
+
+        });
+    </script>
+</head>
+<body>
+<div>
+    <table id="employeeTable" >
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Salary</th>
+            <th></th>
+        </tr>
+        <tr>
+            <td>Tom</td>
+            <td>Tom@qq.com</td>
+            <td>5000</td>
+            <td><a href="deleteEmp?id=001">Delete</a></td>
+        </tr>
+        <tr>
+            <td>Jerry</td>
+            <td>Jerry@163.com</td>
+            <td>7000</td>
+            <td><a href="deleteEmp?id=002">Delete</a></td>
+        </tr>
+        <tr>
+            <td>Mark</td>
+            <td>Mark@gmail.com</td>
+            <td>9000</td>
+            <td><a href="deleteEmp?id=003">Delete</a></td>
+        </tr>
+    </table>
+
+    <table>
+        <tr>
+            <td class="word">name: </td>
+            <td class="inp">
+                <input type="text" name="username" id="empName" />
+            </td>
+        </tr>
+        <tr>
+            <td class="word">email: </td>
+            <td class="inp">
+                <input type="text" name="email" id="email" />
+            </td>
+        </tr>
+        <tr>
+            <td class="word">salary: </td>
+            <td>
+                <input type="text" name="salary" id="salary" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <button id="addEmpButton" value="submit">
+                    Submit
+                </button>
+            </td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

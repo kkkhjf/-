@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript">
+        //src属性可以引入js文件，可以是相对路径也可以是绝对路径
+        // function fun(){
+        //     //获取输入框的对象
+        //     var obj = document.getElementById("text01");
+        //     //利用value属性取出输入框中的值
+        //     var userid = obj.value;
+        //     var patt = /^\w{5,12}$/;
+        //     var useridspanobj = document.getElementById("useridspan");
+        //     /**
+        //      * test()方法用于测试某个字符串，是不是匹配我的规则
+        //      * 匹配成功返回true，匹配失败返回false
+        //      */
+        //     if(patt.test(userid)){
+        //         alert("用户名合法");
+        //     }else{
+        //         useridspanobj.innerHTML = "用户名不合法";
+        //     }
+        // }
+        function checkedall(){
+            var obj = document.getElementsByName("hobby");
+            for (var i = 0; i < obj.length; i++) {
+                obj[i].checked = true;
+            }
+        }
+
+        function checkednon(){
+            var obj = document.getElementsByName("hobby");
+            for (var i = 0; i < obj.length; i++) {
+                obj[i].checked = false;
+            }
+        }
+
+        function checkedrev() {
+            var obj = document.getElementsByName("hobby");
+            for (var i = 0; i < obj.length; i++) {
+                obj[i].checked = !(obj[i].checked);
+            }
+        }
+
+
+    </script>
+</head>
+<body>
+<!--    用户名: <input type="text" id="text01"/>-->
+<!--    <span id="useridspan" style="color:red"></span>-->
+<!--    <button onclick="fun()">注册</button>-->
+<input type="checkbox" name="hobby" value="cpp" />C++
+<input type="checkbox" name="hobby" value="python" />Python
+<input type="checkbox" name="hobby" value="java" />Java
+<br/>
+<button onclick="checkedall()">全选</button>
+<button onclick="checkednon()">全不选</button>
+<button onclick="checkedrev()">反选</button>
+
+</body>
+</html>

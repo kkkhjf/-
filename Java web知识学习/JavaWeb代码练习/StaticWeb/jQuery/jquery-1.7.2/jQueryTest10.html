@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>jQueryTest10</title>
+    <style type="text/css">
+        body{
+            text-align: center;
+        }
+        .sM{
+            margin-top: 150px;
+        }
+        .sB{
+            position: absolute;
+            display: none;
+        }
+    </style>
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript">
+        $(function (){
+            $("#small").bind("mouseover mouseout mousemove",function (){
+                if(event.type == "mouseover"){
+                    $("#smallBig").show();
+                }else if(event.type == "mouseout"){
+                    $("#smallBig").hide();
+                }else if(event.type == "mousempve"){
+                    $("#smallBig").offset({
+                        left: event.pageX + 20,
+                        top: event.pageY + 20
+                    });
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <img id="small" class="sM" src="../../pirates_of_the_caribbean_dead_men_tell_no_tales.jpg"/>
+
+    <div id="smallBig" class="sB">
+        <img src="../../ASLD.jpg"/>
+    </div>
+</body>
+</html>

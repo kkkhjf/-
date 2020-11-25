@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html" charset="UTF-8">
+    <title>jQueryTest06</title>
+    <style type="text/css">
+        body{
+            font-size: 12px;
+            text-align: center;
+        }
+        a{
+            color: #040;
+            text-decoration: none;
+        }
+        .showmore{
+            border: 1px solid black;
+            height: auto;
+            width: 100px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .SubCategoryBox ul{list-style: none;}
+
+    </style>
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript">
+        //品牌展示
+        $(function (){
+            // $("li:gt(5):not(:last)").hide();//方式一获取li标签对象
+            // $("div ul li:gt(5):not(:last)").hide();//方式二获取li标签对象
+            // $("div ul li:gt(5):not(:last)").hide();
+            // $("div div a").click(function (){
+            //
+            // });
+            $("li:gt(5):not(:last)").hide();
+
+            $("div div a").click(function (){
+                //让某些品牌显示或隐藏
+                $("div ul li:gt(5):not(:last)").toggle();
+                //判断品牌是否可见
+                if($("div ul li:gt(5):not(:last)").is(":hidden")){
+                    //品牌隐藏，显示全部品牌
+                    $("div div a span").text("显示全部品牌");
+                }else{
+                    //品牌全部显示，隐藏部分品牌
+                    $("div div a span").text("隐藏部分品牌");
+                }
+                return false;//终止页面跳转，同href="#"类似;
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="SubCategoryBox">
+        <ul >
+            <li><a href="#">佳能</a><i>(30400)</i></li>
+            <li><a href="#">索尼</a><i>(32400)</i></li>
+            <li><a href="#">三星</a><i>(21400)</i></li>
+            <li><a href="#">尼康</a><i>(51400)</i></li>
+            <li><a href="#">松下</a><i>(17400)</i></li>
+            <li><a href="#">卡西欧</a><i>(19400)</i></li>
+            <li><a href="#">富士</a><i>(28400)</i></li>
+            <li><a href="#">柯达</a><i>(14400)</i></li>
+            <li><a href="#">宾得</a><i>(18400)</i></li>
+            <li><a href="#">理光</a><i>(12340)</i></li>
+            <li><a href="#">奥林斯巴</a><i>(7030)</i></li>
+            <li><a href="#">明基</a><i>(6400)</i></li>
+            <li><a href="#">爱国者</a><i>(3400)</i></li>
+            <li><a href="#">其他品牌</a><i>(100400)</i></li>
+        </ul>
+        <div class="showmore">
+                <a href="jQueryTest06.html"><span>显示全部品牌</span></a>
+        </div>
+    </div>
+</body>
+</html>

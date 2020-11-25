@@ -1,0 +1,1 @@
+alert("I want to be a better man!");

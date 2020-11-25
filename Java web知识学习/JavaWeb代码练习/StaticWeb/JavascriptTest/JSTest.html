@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JSTest</title>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+
+    <script type="text/javascript">
+
+    </script>
+
+</head>
+<body>
+<div id="total">
+    <div class="inner">
+        <p>你喜欢哪个城市？</p>
+        <ul>
+            <li id="bj">北京</li>
+            <li>合肥</li>
+            <li>武汉</li>
+            <li>上海</li>
+        </ul>
+        <br/>
+        <p>你喜欢哪款游戏？</p>
+        <ul>
+            <li>红警</li>
+            <li>星际</li>
+            <li>实况</li>
+            <li>反恐精英</li>
+        </ul>
+        <br/>
+        <p>你手机的操作系统是？</p>
+        <ul id="phone">
+            <li>IOS</li>
+            <li id="android">Android</li>
+            <li>Windows Phone</li>
+        </ul>
+        <br/>
+    </div>
+    <br/>
+    <br/>
+    <div class="inner">
+        gender:
+        <input type="radio" name="gender" value="male"/>Male
+        <input type="radio" name="gender" value="female"/>Female
+        <br/>
+        <br/>
+        name:
+        <input type="text" name="name" id="username" value="abcde"/>
+    </div>
+    <br/>
+
+</div>
+<div id="btnList">
+    <div><button id="btn01">查找#bj节点</button></div>
+    <div><button id="btn02">查找所有li节点</button></div>
+    <div><button id="btn03">查找name-gender所有节点</button></div>
+    <div><button id="btn04">查找#city下的所有li节点</button></div>
+    <div><button id="btn05">查找#city下的所有子节点</button></div>
+    <div><button id="btn06">查找#phone下的第一个节点</button></div>
+    <div><button id="btn07">返回#bj的父节点</button></div>
+    <div><button id="btn09">返回#android的前一个兄弟节点</button></div>
+    <div><button id="btn010">设置username的value属性值</button></div>
+    <div><button id="btn011">返回#bj的文本值</button></div>
+</div>
+</body>
+</html>

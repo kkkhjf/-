@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>jQueryTest07</title>
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript">
+        window.onload = function (){
+            alert("原生js的页面加载完成之后");
+        }
+
+        $(document).ready(function (){
+             
+        });
+
+        $(function (){
+            alert("jQuery页面加载完成之后");
+        });
+    </script>
+</head>
+<body>
+    <button>我是按钮</button>
+    <iframe src="http://baidu.com"></iframe>
+</body>
+</html>
