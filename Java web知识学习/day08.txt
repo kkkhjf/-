@@ -1,0 +1,77 @@
+1、图片跟随
+	保持鼠标在图片范围内移动时，会显示大图；
+	图片跟随需要mouseover、mouseout和mousemove三个事件
+		 $(function (){
+            $("#small").bind("mouseover mouseout mousemove",function (){
+                if(event.type == "mouseover"){
+                    $("#smallBig").show();
+                }else if(event.type == "mouseout"){
+                    $("#smallBig").hide();
+                }else if(event.type == "mousempve"){
+                    $("#smallBig").offset({
+                        left: event.pageX + 20,
+                        top: event.pageY + 20
+                    });
+                }
+            });
+        });
+
+2、XML
+	xml是可扩展的标记性语言；
+	xml的作用
+		用来保存数据，而且这些数据具有自我描述性；
+		可以作为项目或者模块的配置文件；
+		还可以作为网络数据传输的格式(JSON为主)；
+	xml文件的创建
+		<?xml version="1.0" encoding="utf-8" ?>
+		<!--
+			<?xml version="1.0" encoding="utf-8" ?>
+			以上就是xml文件的声明
+			version="1.0"       version 表示xml的版本
+			encoding="utf-8"    encoding表示xml文件本身的编码
+		-->
+		<books><!-- books 表示多个图书信息 -->
+			<book sn="SN123412123421"><!-- book表示一个图书信息 sn属性表示图书序列号-->
+				<name>时间简史</name><!-- name标签表示书名 -->
+				<author>霍金</author><!-- author标签表示图书的作者 -->
+				<price>75</price><!-- price标签表示图书价格 -->
+			</book>
+			<book sn="SN123412123421"><!-- book表示一个图书信息 sn属性表示图书序列号-->
+				<name>Java从入门到放弃</name><!-- name标签表示书名 -->
+				<author>李伟</author><!-- author标签表示图书的作者 -->
+				<price>118</price><!-- price标签表示图书价格 -->
+			</book>
+		</books>
+	xml语法
+		xml的注释和html一样
+		元素（标签）
+			html标签
+				格式：<标签名>封装的数据</标签名>
+				单标签：<标签名 />
+				双标签：<标签名>封装的数据</标签名>
+				标签名不分大小写
+				标签属性：基本属性和事件属性
+				标签要闭合
+			xml元素（可以理解为标签）
+				从开始标签(且包括)到结束标签(且包括)，元素可包括其他元素、文本或两者的混合物，元素也可以拥有属性；
+			xml命名规则
+				名称可以包含数字、字母以及其它字符；
+				名称不能以数字或标点符号开始；
+				名称不能以字符“xml”（XML或Xml）开始；
+				名称不能包含空格；
+			xml属性
+				xml标签属性和html属性是非常类似（属性可以提供元素的额为信息）；
+				在标签上可以书写多个属性，每个属性必须使用引号；
+				xml对大小写敏感；
+				标签必须正确的嵌套；
+				xml文档必须要有根元素
+					根元素是没有父标签的顶级元素，而且是唯一个一个才行；
+				xml中的特殊元素必须要转义（&lt;--> < , &gt;--> >）
+				文本区域（CDATA区）
+					CDATA语法可以告诉xml解析器，我CDATA里的文本内容只是纯文本，不需要解析；
+					CDATA格式：<![CDATA[这里可以把你输入的字符原样显示，不会解析xml]]>；
+			xml解析技术介绍
+				不管是html文件还是xml文件它们都是标记型文档，都可以使用w3c组织制定的dom技术来解析。
+					
+				
+				
