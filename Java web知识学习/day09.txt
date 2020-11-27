@@ -1,0 +1,18 @@
+1、javaWeb的概念
+	javaWeb是指所有通过Java语言编写可以通过浏览器访问的程序的总称，javaWeb是基于请求和响应来开发；
+	请求是指客户端给服务器发送数据，Request；
+	响应是指服务器给客户端回传数据，Response；
+	请求和响应是成对出现
+
+2、部署Web工程到Tomcat
+	第一种方法
+		只需要把web工程的目录拷贝到Tomcat的webapps目录下；
+	第二种方法
+		在Tomcat下的conf目录创建一个xml配置文件
+			<!-- Context表示一个工程的上下文
+				 path表示工程的访问路径
+				 docBase表示工程目录在哪里
+			-->
+			<Context path="/工程的访问路径（不一定是工程名称）" daocBase="网站的保存路径" />
+	浏览器地址栏中输入的地址没有工程名，默认访问root工程；
+	浏览器地址栏中输入的地址没有文件名，默认访问index.html；
