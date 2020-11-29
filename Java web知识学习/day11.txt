@@ -1,0 +1,80 @@
+1、Servlet生命周期
+	第一次访问时创建Servlet程序会调用一次构造器和初始化方法
+		执行Servlet构造器方法
+		执行init初始化方法
+	每次访问Servlet程序时都会被执行
+		执行service方法
+	在Web工程被销毁时，执行此方法
+		执行destroy销毁方法
+		
+2、请求的分发处理
+	在servlet类中获取请求类型需要使用ServletRequest请求的子类HttpServletRequest
+		HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
+	再利用getMethod()方法获取请求的类型，返回String类型；
+	处理请求时最好使用doGet/Post方法进行处理；
+	
+3、开发中实现Servlet程序
+	一般是通过继承HttpServlet类的方式去实现Servlet程序
+		编写一个类去继承HttpServlet类
+		根据业务需要重写doGet或doPost方法
+		到web.xml中配置Servlet程序的访问地址
+		
+4、Servlet类的继承体系
+	interface Service--->(实现)Class GennericServlet--->(继承)Class HttpServlet--->(继承)自定义的Servlet程序
+	GennericServlet类实现了Service接口，做了很多空实现，并持有一个ServletConfig类的引用，
+		并对ServletConfig的使用做了一些方法；
+	HttpServlet抽象类实现了service()方法，并实现了请求的分发处理；
+	
+5、ServletConfig类
+	ServletConfig类是Servlet程序的配置信息类；
+	ServletConfig类的三大作用
+		获取Servlet程序的别名(servlet-name的值)
+			//获取Servlet程序的别名
+			System.out.println("Hello程序的别名是："+config.getServletName());
+		获取初始化参数init-param
+			//获取初始化参数init-param
+			System.out.println("初始化参数username的值是："+config.getInitParameter("username"));
+			System.out.println("初始化参数url的值是："+config.getInitParameter("url"));
+		获取Servlet Context对象
+			Servlet程序在创建的时候Tomcat会创建一个ServletContext对象，其中用来封装初始化信息；
+			//获取ServletContext对象
+			System.out.println("ServletContext对象是："+config.getServletContext());
+			
+	注：在继承HttpServlet类的子类中，重写init方法需要调用super.init();
+
+6、ServletContext类
+	ServletContext是一个接口，他表示Servlet上下文对象；
+	一个Web工程只有一个SercletContext对象；
+	ServletContext对象是一个域对象（可以像Map一样存取数据的对象，这里的域指的是存取数据的范围“整个WEB工程”）
+					存数据			取数据			删除数据
+		Map			 put()			 get()			remove()
+		域对象	  setAttribute()  getAttribute()   removeAttribute()
+	ServletContext类的四个作用
+		获取web.xml中配置的上下文参数context-param；
+			<!--context-param是上下文参数(它属于整个web工程)-->
+			<context-param>
+				<param-name>username</param-name>
+				<param-value>context</param-value>
+			</context-param>
+			<context-param>
+				<param-name>password</param-name>
+				<param-value>root</param-value>
+			</context-param>
+			
+			//获取context-param中保存的参数
+			ServletContext servletContext = getServletConfig().getServletContext();
+			System.out.println("context-param参数username的值是："+servletContext.getInitParameter("username"));
+			System.out.println("context-param参数username的值是："+servletContext.getInitParameter("password"));
+		获取当前的工程路径，格式：/工程路径；
+			//获取当前的工程路径，格式:/工程路径；
+			System.out.println("当前工程路径："+servletContext.getContextPath());
+		获取工程部署后在服务器硬盘上的绝对路径；
+			//获取工程部署再服务器硬盘上的绝对路径；
+			/**
+			*  / 斜杠被服务器解析地址为：https://ip:port/工程名/  映射到idea代码的web目录
+			*/
+			System.out.println("工程部署的路径是："+servletContext.getRealPath("/"));
+		像Map一样存取数据；
+			ServletContext在存入数据后，整个web工程下都可以进行访问ServletContext对象的value；
+			servletContext.setAttribute("key1","value1");
+			System.out.println("servletContext域中key1的值是："+servletContext.getAttribute("key1"));

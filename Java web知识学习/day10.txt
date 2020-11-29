@@ -1,0 +1,50 @@
+1、Servlet
+	Javaee规范之一、规范就是接口；
+	Servlet是JavaWeb三大组件之一，三大组件分别是Servlet程序、Filter过滤器和Listener监听器；
+	Servlet是运行在服务器端的小型程序，用来接受和响应客户端的请求；
+	手动实现Servlet程序
+		编写一个类去实现Servlet接口；
+		实现service方法处理请求，并响应数据；
+		到web.xml文件中配置servlet程序的访问地址
+			<!--servlet标签给Tomact配置Servlet程序-->
+			<servlet>
+				<!--servlet-name标签是给Servlet程序取一个别名（一般是类名）-->
+				<servlet-name>HelloServlet</servlet-name>
+				<!--servlet-class标签是Servlet程序的全类名-->
+				<servlet-class>com.hejianfeng.servlet.HelloServlet</servlet-class>
+			</servlet>
+			<!--servlet-mapping标签给Servlet程序配置访问地址-->
+			<servlet-mapping>
+				<!--servlet-name标签的作用是为了告诉服务器，当前标签配置的地址是给哪个Servlet程序使用-->
+				<servlet-name>HelloServlet</servlet-name>
+				<!--url-pattern标签配置访问地址
+						/ 斜杠在服务器解析时，表示地址为http://ip:port/工程路径
+						HelloServlet 表示地址为http://ip:port/工程路径/HelloServlet-->
+				<url-pattern>/HelloServlet</url-pattern>
+			</servlet-mapping>
+		常见的错误
+			url-pattern中配置的路径没有以斜杠打头；
+			servlet-name配置的值不存在，配置的值要和类名相同；
+			servlet-class标签的全类名配置错误；
+	servlet-url定位访问Servlet程序原理
+		客户端：http://localhost：8080/Servlet/HelloServlet
+				localhost		服务器ip
+				:8080			服务器端口号
+				/Servlet		工程路径
+				/HelloServlet	资源路径
+		通过资源路径先在web.xml文件中寻找<url-pattern>对应的资源路径名，再利用<servlet-mapping>中的<servlet-name>
+			找到<servlet>中对应的<servlet-name>标签下的工程路径，最后访问<servlet-class>里标注的.class文件，执行service方法；
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+		
+	
