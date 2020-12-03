@@ -1,0 +1,96 @@
+1、El表达式（Expression Language,是表达式语言）
+	作用：EL表达式主要是替代jsp页面中的表达式脚本在jsp页面进行数据输出；
+	格式：${表达式}，El表达式在输出null值（空串），jsp表达式输出null值（null字符串）；
+		输出复杂类型的值
+			输出Person（EL表达式）：${person}<br/>
+			输出Person的name属性：${person.name}<br/>
+			输出Person的phone属性：${person.phone[0]}<br/>
+			输出Person的cities属性：${person.cities}<br/>
+			输出Person的cities的某个属性：${person.cities[0]}<br/>
+			输出Person的map属性：${person.map}
+			输出Person的map的某个属性：${person.map.get("key2")}
+			注：EL表达式输出属性时，不是直接从类中获取属性的值，而是调用get方法获取值；
+	EL表达式主要是用来输出域对象中的数据；
+	当四个域中都用相同key的数据，EL表达式会按照从小到大的顺序进行索索，找到就输出
+		pageContext < request < session < application
+	EL表达式的运算
+		格式：${运算表达式}
+		EL支持的运算关系符
+			关系运算
+				==或eq、!=或ne、<或lt、>或gt、<=或le、>=或ge、
+			逻辑运算
+				&&或and、||或or、!或not 
+			算数运算
+				+、-、*、/或div、%活mod
+			empty运算
+				empty运算判断一个数据是否为空，如果不为空输出true，反之；
+				格式：${empty 数据对象属性}
+				以下几种情况为空
+					值为null的时候为空；
+					值为空串的时候为空；
+					值是Object类型数组，长度为0的时候为空；
+					list集合、map集合元素个数为0；
+				注：Object类型数组中的只含有空串不算为空；
+			三元运算
+				表达式1？表达式2：表达式3；
+			点运算
+				.点运算可以输出Bean对象中某个属性的值；
+				[]中括号运算，，可以输出有序集合中某个元素的值；并且中括号运算，还可以输出map集合中key里含有特殊字符的key的值；
+					Map<String,Object> map = new HashMap<>();
+					map.put("a.a.a","value1");
+					<!--输出带有特殊字符属性的值，需要使用中括号运算符-->
+					${map['a.a.a']}
+	EL表达式的11个隐含对象
+		EL表达式中的11个隐含对象，是EL表达式总计定义的，可以直接使用；
+			变量					类型						作用
+		 pageContext		   PageContextImpl			它可以获取jsp中的九大内置对象
+		 
+		 pageScope			   Map<String,Object>		它可以获取pageContext域中的数据
+		 requestScope		   Map<String,Object>		它可以获取Request域中的数据
+		 sessionScope		   Map<String,Objcet>		它可以获取Session域中的数据
+		 applicationScope	   Map<String,Objcet>		它可以获取ServletContext域中的数据
+		 
+		 param				   Map<Stirng,String>		它可由获取请求参数的值
+		 paramValues		   Map<String,String[]>		它也可以获取请求参数的值(获取多个值的时候使用)
+		 
+		 header				   Map<String,Stirng>		它可以获取请求头的信息
+		 headerValues		   Map<String,String[]>		它可以获取请求头的信息，它可以获取多个值的情况
+		 
+		 cookie				   Map<String,Cookie>		它可以获取当前请求的Cookie信息
+		 initParam			   Map<String,String>		它可以获取在web.xml文件中配置的<context-param>上下文参数
+	EL获取四个特定域中的属性
+		<%
+			pageContext.setAttribute("key3","pageContext1");
+			request.setAttribute("key4","request1");
+			session.setAttribute("key5","session1");
+			application.setAttribute("key6","application1");
+		%>
+		${pageScope.key3}<br/>
+		${requestScope.key4}<br/>
+		${sessionScope.key5}<br/>
+		${applicationScope.key6}
+		
+	pageContext对象的使用
+		<!--  request.getScheme() 可以获取请求的协议
+          request.getServerName() 可以获取服务器ip
+          request.getServerPort() 可以获取服务器端口号
+          request.getContextPath() 可以获取当前工程路径
+          request.getMethod()      获取请求方式
+          request.getRemoteHost()  获取客户端ip
+          session.getId()          获取会话id
+		-->
+		协议：              ${pageContext.request.scheme}<br/>
+		服务器ip：          ${pageContext.request.serverName}<br/>
+		服务器端口：        ${pageContext.request.serverPort}<br/>
+		获取工程路径：      ${pageContext.request.contextPath}<br/>
+		获取请求方法：      ${pageContext.request.method}<br/>
+		获取客户端IP地址：  ${pageContext.request.remoteHost}<br/>
+		获取会话的id编号：  ${pageContext.session.id}
+	EL表达式其他隐含对象的使用
+		输出请求参数username的值：${param.username}<br/>
+		输出请求参数password的值：${param.password}<br/>
+		输出请求参数username的值：${paramValues.username[0]}
+		获取请求头信息与上面类似
+		获取cookie也与上面类似（cookie中以键值对形式存储数据）
+		获取cookie的名称：${cookie.JSESSIONID.name}
+		获取cookie的数据：${cookie.JSESSIONID.value}	
