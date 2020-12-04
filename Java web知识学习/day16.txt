@@ -1,0 +1,132 @@
+1、JSTL（Java Standard Tag Libary）标签库
+	JSTL标签库是一个不断完善的开源的jsp标签库；
+	EL表达式为了替换jsp中的表达式脚本，标签库是为了替换代码脚本；
+	使用JSTL标签库需要使用taglib指令引入标签库
+		CORE标签库
+			<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+		FMT标签库
+			<%@ taglib prefix="x" uri="http://java.sun.com/jsp/jstl/fnt" %>
+		FUNCTIONS标签库
+			<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+	JSTL标签库的使用步骤
+		导入jstl标签库的jar包；
+			taglibs-standard-impl.jar
+			taglibs-standard-spec.jar
+		是用taglib指令引入标签库；
+			<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+	JSTL标签库标签的使用
+		<c:set />设置域中的键值对
+			scope属性设置保存到哪个域
+				page--->PageContext域
+				request--->Request域
+				session--->Session域
+				application--->ServletContext域
+			var属性设置key；
+			value属性设置value；
+		<c:if></c:if>用来做if判断
+			test属性表示判断的条件（使用El表达式输出）
+			注：<c:if></c:if>只能进行一次判断
+		<c:choose><c:when test="判断条件"></c:when><c:otherwlse></c:otherwlse></c:choose>多路判断类似于switch-case
+			choose标签开始选择判断；
+			when标签表示每一种判断情况；
+				test属性表示当前这种判断情况的值；
+			otherwlse标签表示剩下的情况
+			注：符合当前条件不再判断后面的条件；
+				标签里不要使用html注释，使用jsp注释<%-- --%>;
+				when标签的父标签一定要是choose标签；
+		<c:foreach></c:foreach>遍历操作
+			循环遍历
+				begin属性设置开始的索引；
+				end属性设置结束的索引；
+				var属性表示循环的变量；
+			遍历数组
+				items属性表示遍历的数据源（遍历的集合）
+				var表示当前遍历到的数据
+				begin表示开始的索引
+				end表示结束的索引
+				step表示遍历的步长值（i+的具体值）
+				varStatus表示当前遍历到的数据状态；
+					varStatus实现了一个LoopStatus接口，实现接口里获取状态信息的方法
+					 public Object getCurrent()		表示获取当前遍历到的数据
+					 public int getIndex()			表示获取遍历的索引
+					 public int getCount()			表示遍历的个数
+					 public boolean isFirst()		表示当前遍历的数据是否为第一条
+					 public boolean isLast()		表示当前遍历的数据是否为最后一条
+					 public integer getBegin()		表示获取begin、end、step的属性
+					 public integer getEnd()		同上
+					 public integer getStop()		同上
+			
+2、文件的上传和下载
+	文件的上传
+		首先要有一个form标签，method=post请求；
+		form标签要有encType属性，其值必须为multipart/form-data值；
+		在form标签中使用input type=file添加上传的文件；
+		编写服务器代码（Servlet接受），处理上传的文件；
+			encType=multipart/form-data表示提交的数据，以多段（每一个表单项一个数据段）的形式进行拼接，然后以二进制流的形式发送给服务器；
+			上传的http报文中boundary属性表示报文体的分隔符（每次提交都会随机生成）
+		解析上传文件的数据
+			使用commons-fileupload.jar和commons-io.jar
+			ServletFileUpload类的使用
+				boolean ServletFileUpload.isMultipartContent(HttpServletRequest request);
+					判断当前上传输的数据格式是否是多段的格式；
+				public List<FileItem> parseRequest(HttpServletRequest request);
+					解析上传的数据
+				booelean FileItem.isFormFile();
+					判断当前的表单项是不是普通的表单项，还是上传的文件类型；
+					true表示普通类型的表单项；
+					false表示上传的文件类型；
+				String FileItem.getFileName();
+					获取表单项name的属性值；
+				String FileItem.getString();
+					获取当前表单项的值
+				String FileItem.getName();
+					获取上传的文件名；
+				void FileItem.write(file);
+					讲上传的文件指向参数file所指向的磁盘位置；
+			ServletFileUpload类库的使用
+				 if(ServletFileUpload.isMultipartContent(req)){
+					//创建FileItemFactory工厂实现类
+					FileItemFactory fileItemFactory = new DiskFileItemFactory();
+					//创建用于解析上传数据的工具类ServletFileUpload类
+					ServletFileUpload servletFileUpload = new ServletFileUpload(fileItemFactory);
+					//解析上传的数据得到每一个表单项FileItem
+					try {
+						List<FileItem> list = servletFileUpload.parseRequest(req);
+						//循环判断每一个表单项是普通类型还是上传的文件
+						for(FileItem fileItem : list){
+							if(fileItem.isFormField()){
+								//普通表单项
+								System.out.println("表单项的name属性值：" + fileItem.getFieldName());
+								//参数UTF-8解决乱码问腿
+								System.out.println("表单项的value属性值：" + fileItem.getString("UTF-8"));
+							}else{
+								//上传表单项
+								System.out.println("表单项的name属性值：" + fileItem.getFieldName());
+								System.out.println("上传的文件名：" + fileItem.getName());
+								fileItem.write(new File("d:\\迅雷下载\\" + fileItem.getName()));
+							}
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+
+3、文件下载
+	下载的过程
+		客户端-------------------->服务器
+			   发请求，告诉服务器	1、获取要下载的文件名
+			   即将下载的文件类型	2、读取要下载的文件内容
+									3、把下载的文件内容回传给客户端
+									4、告诉客户端返回的数据类型
+									5、告诉客户端收到的数据是用于下载使用(还是使用响应头告知)
+	处理中文下载名乱码问题
+		将中文文件名进行转码
+			URLEncoder.encode("中文下载名","UTF-8");
+		在采用Base64编码的浏览器中解决中文乱码
+			编码方法
+				Content-Disposition: attachment; filename= =?charset?B?xxxxx?=
+					=？		表示编码内容的开始；
+					charset 表示字符集；
+					B		表示BASE64编码；
+					xxxxx	表示文件名BASE64编码后的内容；
+					?=		表示编码内容的结束；
