@@ -1,0 +1,74 @@
+1、常见函数
+	功能：类似于Java中的方法，将一组逻辑语句封装在方法体中，对外暴露方法名；
+	函数调用：select 函数名(实参列表) 【from 表】
+	分类：
+		单行函数（传单值返回单值）
+			concat、length、ifnull等；
+		分组函数（传多值返回多值）
+			功能：做统计使用，又称为统计函数、聚合函数、组函数；
+	单行函数
+		字符函数
+			LENGTH(expr1)		 获取参数值的字节个数
+			CONCAT(expr1,expr2)	 拼接字符串
+			UPPPER(expr1)		 字符串大写
+			LOWER(expr2)		 字符串小写
+			SUBSTR(expr,num...)  截取字符串
+				两个参数，开始索引默认从1开始，截取从num开始到后面的所有字符；
+				三个参数，num1开始索引，num2截取的长度；
+			INSTR(expr1，expr2)	 返回expr2在expr1中第一次出现的起始索引，找不到则返回0；
+			TRIM(expr)			 去除首尾的空格；
+				TRIM(expr1 FROM expr2)	去除expr2首尾的expr1；	
+			LAPD(expr1,num,expr2)把expr2填充到expr1的左边，总长度不超过num，如果expr1超过num，则从右截断；
+			RPAD(expr1,num,expr2)把expr2填充到expr1的右 边，总长度不超过num，如果expr1超过num，则从右截断；
+			REPLACE(expr1，expr2，expr3)使用expr3替换expr1中的expr2；
+		数学函数
+			ROUND				四舍五入
+				ROUND(float)        四舍五入；
+				ROUND(float，num)	四舍五入，保存num位；
+			CEIL(float)			向上取整，返回>=该参数的最小整数；
+			FLOOR(float)		向下取整，返回<=该参数的最大整数；
+			TRUNCATE(float，num)保留floatnum位；
+			MOD(num1,num2)		num1-num1/num2*num2 取余；
+		日期函数
+			NOW()						返回当前系统日期时间；
+			CURDATE()					返回当前系统日期，不包含时间；
+			CURTIME()					返回当前系统时间，不包含日期；
+			YEAR() MONTH() ...			返回日期的年、月、...
+			STR_TO_DATE(expr，type)		将日期格式的字符串转换成指定格式的日期；
+				%Y	四位的年份
+				%y	2位的年份
+				%m	月份(01，02，03，，，10，11，12)
+				%c	月份(1，2，3，，，10，11，12)
+				%d	日
+				%H	小时(24小时制)
+				%h	小时(12小时制)
+				%i 	分钟
+				%s	秒
+			DATE_FORMAT(expr，type)		将日期转换成字符串
+		流程控制函数
+			IF函数		实现if-else的效果
+				IF(expr1，expr2，expr3)	expr1为true，返回expr2的值，否则返回expr3的值；
+			CASE函数	实现switch-case的效果
+				CASE  要判断的字段或者表达式
+				WHEN 常量1 THEN 要显示的的值1或语句1;
+				WHEN 常量2 THEN 要显示的的值2或语句2;
+				...
+				ELSE 要显示的值n
+				END
+						实现多重if
+				CASE
+				WHEN 条件1 THEN 要显示的值1或语句1;
+				WHEN 条件2 THEN 要显示的值2或语句2;
+				...
+				ELSE 要显示的值n或语句n;
+				END
+				实例：
+					SELECT salary,
+					CASE
+					WHEN salary>20000 THEN 'A'
+					WHEN salary>15000 THEN 'B'
+					WHEN salary>10000 THEN 'C'
+					ELSE 'D'
+					END AS 工资级别
+					FROM employees;
+				
