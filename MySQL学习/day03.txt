@@ -1,0 +1,80 @@
+1、单行函数
+	分组函数
+		SUM(expr) 求和、AVG(expr) 平均、MIN(expr) 最小、MAX(expr) 最大、COUNT(expr) 计数
+		特点：
+			SUN、AVG一般用于处理数值型，MIN、MAX、COUNT可以处理任何类型；
+			以上分组函数都忽略NULL值；
+			可以和DISTINCT搭配使用，实现去重；
+		COUNT函数的详细介绍
+			一般使用COUNT(*)用于统计行数；
+		和分组函数一同查询的字段要求是GROUP BY后面的字段，其他的都不行；
+	分组查询
+		SELECT 分组函数、列(要求出现在GROUP BY的后面)
+		FROM 表
+		【WHERE 筛选条件】
+		GROUP BY 分组的列表
+		【ORDER BY 字句】
+		注意：
+			查询列表比较特殊，要求是分组函数和GROUP BY后出现的字段;
+			group by后面加的列应该是有重复的数据的列；
+		特点：
+			分组筛选分为两类
+									数据源			位置					关键字
+				分组前筛选		  	原始表			group by字句的前面		where	
+				分组后筛选			分组后的结果集 	group by字句的后面		group
+			分组函数做条件肯定是放在having子句中；
+			能用分组前筛选的就优先用where子句进行筛选；
+			多个字段的分组查询就要在group by字句后加上多个字段，中间用逗号分隔；
+			排序要加在整个分组查询之后；
+2、连接查询
+	当查询的字段涉及到多个表时，就要用到连接；
+	分类：
+		内连接
+			等值连接（显示表的交集部分）
+				select 字段列表 from 表1，表2 where 表1.字段名 = 表2.字段名
+			非等值连接
+				where中的连接条件不是等值判断条件；
+			自连接
+				自己和自己进行连接操作；
+			特点：
+				一般为表起别名；
+				多表的顺序可以调换；
+				n表连接至少需要n-1个连接条件；
+				等值连接是查询表的交集部分；
+		内连接的另一种表示方法
+			select 查询列表
+			from 表1 别名 【连接类型】
+			join 表2 别名 
+			on 连接条件
+			【where 筛选条件】
+			【group by 分组】
+			【having 筛选条件】
+			【order by 排序列表】
+			分类：
+				等值连接
+					select 查询字段
+					from 表1 别名1
+					join 表2 别名2
+					on 别名1.字段 = 别名2.字段
+					【筛选条件】
+				非等值连接
+					连接条件不等于即可
+				自连接
+					同外连接的自连接
+		外连接
+			应用场景：查询一个表中有，另一个表中没有的记录
+			特点：
+				外连接的查询结果为主表中的所有记录；
+				如果从表中有和它匹配的则显示记录，否则该行显示null；
+			分类：
+				左外连接（向左并集）left join  左边是主表
+				右外连接（向右并集）right jion 右边是主表
+				全外连接（并集）full join	   全外连接=内连接的结果+表1中有但是表2没有+表2中有但是表1中没有
+			select <select list>		select <select list>	select <select list>
+			from A						from A					from A
+			left join B					right join B			full join
+			on A.key = B.key			on A.key = B.key		on A.key = B.key
+			where b.key is null			where A.key is null		where A.key is null or B.key is null
+		交叉连接 cross join 笛卡尔乘积
+			
+		
