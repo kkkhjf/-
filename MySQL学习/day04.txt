@@ -1,0 +1,171 @@
+1、子查询
+	出现在其他语句的SELECT语句（子查询），外部的查询语句（父查询）；
+	分类：
+		按子查询出现的位置
+			select后面（支持标量子查询）
+			from后面（支持表子查询）
+			where或having后面（标量子查询、列子查询、行子查询）
+			exists后面（相关子查询）
+		按结果集的行列数不同
+			列子查询（一列多行）
+			行子查询（一行多列）
+			表子查询（结果集）
+	where或having后面
+		特点：
+			子查询放在小括号内；
+			子查询一般放在条件的右侧；
+			标量子查询，一般搭配着单行操作符使用（> < >= <= <> =）；
+			列子查询，一般搭配着多行操作符使用（IN ANY/SOME ALL）；
+			子查询都要优先于主查询执行；
+		非法使用标量子查询，子查询的结果不是一行一列；
+		列子查询实例
+			案例：查询其他部门的工资比工种为'IT_PROG'所在部门的任意员工工资低的员工信息
+				select employee_id, last_name, job_id, salary
+				from employees
+				where department_id not in (
+						select department_id
+						from employees
+						where job_id='IT_PROG'
+				) and salary < (
+						select MIN(salary)
+						from employees
+						where department_id = (
+								select DISTINCT department_id
+								from employees
+								where job_id='IT_PROG'
+						)
+				);
+		行子查询
+			案例：查询员工编号最小并且工资最高的员工信息
+				常规查询方式
+					select *
+					from employees
+					where salary = (
+							select max(salary)
+							from employees
+							where employee_id = (
+									select DISTINCT MIN(employee_id)
+									from employees
+							)
+					);
+				行子查询方式
+					select *
+					from employees
+					where (employee_id,salary) = (
+							select MIN(employee_id),MAX(salary)
+							from employees
+					);
+	select后面的子查询
+		仅仅支持一行 一列；
+		案例：查询每个部门的员工人数
+			select d.department_name, (
+				select COUNT(*)
+				from employees e
+				where e.department_id = d.department_id
+			)
+			from departments d
+	from后面的子查询
+		将子查询结果充当一张表，要求必须起别名；
+		案例：查询每个部门的平均工资等级
+			select *, grade_level
+			from (
+					select AVG(salary) ag
+					from employees
+					GROUP BY department_id
+			) agsalary 
+			INNER JOIN job_grades
+			on agsalary.ag BETWEEN lowest_sal and highest_sal;
+	exists后面（相关子查询）
+		exists(查询语句)
+			如果查询结果存在就返回1，否则就返回0；
+		案例：查询有员工的部门名
+			select d.department_name
+			from departments d
+			WHERE EXISTS(
+					select e.employee_id
+					from employees e
+					WHERE e.department_id = d.department_id 
+			);
+		exists和其他子查询不一样，先从父查询开始；
+		能用exists语句的一定可以使用IN关键字；
+	子查询案例
+		案例1：
+			select last_name, salary
+			from employees
+			where department_id = (
+					select department_id
+					from employees 
+					where last_name='Zlotkey'
+			);
+		案例2：
+			select employee_id, last_name, salary
+			from employees e
+			where salary > (
+					select AVG(salary)
+					from employees
+			);
+
+		案例3：
+			select  employee_id, last_name, salary
+			from employees e
+			INNER JOIN(
+					select AVG(salary) avg_s, department_id
+					from employees
+					GROUP BY department_id
+			) dsalary
+			ON e.department_id = dsalary.department_id and e.salary>dsalary.avg_s;
+		案例4：
+			select employee_id, last_name
+			from employees
+			where department_id in (
+					select distinct department_id
+					from employees
+					where last_name like '%u%'
+			);
+		案例5：
+			select employee_id
+			from employees
+			where department_id in (
+					select distinct department_id
+					from departments
+					where location_id = 1700
+			);
+		案例6：
+			select last_name,salary
+			from employees e
+			where manager_id in (
+					select employee_id
+					from employees
+					where last_name='K_ing'
+			);
+		案例7：
+			select CONCAT(first_name,',',last_name)
+			from employees
+			where salary = (
+					select MAX(salary)
+					from employees
+			);
+
+2、分页查询
+	应用场景：当要显示的数据不能在一页完全显示；
+	语法：
+		selec 查询列表
+		【join type join 表2
+		on 连接条件
+		where 筛选条件
+		group by 分组字段
+		having 分组后的筛选
+		order by 排序的字段】
+		limit offset，size；
+		
+		offset：要显示的起始索引（起始索引从0开始，mysql的起始索引是从1开始）；
+		size：要显示的个数；
+		案例：显示有奖金的员工的工资top10信息
+			select last_name,salary
+			from employees
+			where commission_pct is not null
+			ORDER BY salary DESC
+			limit 10;
+		特点：	
+			limit放在查询语句的最后，语法上的执行顺序也是在最后；
+			limit （page-1）*size，size；
