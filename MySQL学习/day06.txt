@@ -1,0 +1,98 @@
+1、库的管理
+	语法：
+		库的创建：create database 库名;
+		更改库的字符集：alter database 库名 character set 字符集名;
+		库的删除：drop database 库名;
+
+2、库的管理
+	表的创建
+		create table 表名(
+			列名 列的类型【(长度) 约束】,
+			列名 列的类型【(长度) 约束】,
+			列名 列的类型【(长度) 约束】,
+			...
+			列名 列的类型【(长度) 约束】
+		)
+	表的修改
+		修改列名：alter table 表名 change colum 旧列名 新列名 类型;
+		修改列的类型或约束：alter table 表名 modify colum 列名 类型;
+		添加新列：alter table add colum 列名 类型;
+		删除列：alter table 表名 drop colum 列名;
+		修改表名：alter table 旧表名 rename to 新表名;
+	表的删除
+		drop table 表名;
+	表的复制
+		仅仅复制表的结构
+			create table 新表名 like 旧表名;
+		复制表的结构加数据
+			create table 新表名 select * from 旧表名 【筛选条件】;
+		仅仅复制部分字段
+			create table 新表名 select 字段名,... from 旧表名 where筛选条件永假
+		
+3、常见的数据类型
+	数值型：
+		整型：tinyint(1个字节)、smallint(2个字节)、mediumint(3个字节)、int(4个字节)、bigint(5个字节)
+			特点：
+				如果不设置无符号，默认为无符号，设置无符号数要在数据类型后面加上unsigned关键字；
+				如果插入的数值超过范围，最后插入的是临界值；
+		小数：	长度指显示的最大宽度；
+			定点数：
+				dec(m,d)
+				decimal(m,d)
+			浮点数：
+				float(m,d)
+				double(m,d)
+			特点：
+				m指整数部位+效数部位，d指小数部位；
+				decimal默认m为10，d为0；
+				定点型精度较高；
+	字符型：
+		短文本：char、varchar
+			char型表示固定长度的字符，varchar表示可变长度的字符；
+			char可以不定义长度，varchar不可省略；
+		长文本：text、blob(较长的二进制数据)
+	日期型：
+		 date
+
+4、常见约束
+	含义：限制表中的数据，为了保证表中数据的可靠性；
+	分类：
+		not null	非空，用于保证该字段的值不能为空；
+		default		默认，该字段有默认值；
+		primary key	主键，由于保证该字段的值具有唯一值，并且非空；
+		unique		唯一，用于保证该字段的值具有唯一性，可以为空；
+		check：		检查约束【mysql不支持】
+		foreign key	外键，用于限制两个表的关系，用于保证该字段的值必须来自于主表的关联列的值；
+		
+	添加约束的时间：
+		创建表时或修改表时；
+	约束的分类：
+		添加列级约束：
+			create table stuinfo(
+				id int primary key,#主键
+				stuname varchar(10) not null,#非空
+				gender char(1) check(gender='男' or gender='女'),#检查
+				seat int unique,#唯一·
+				age int default 18,#默认约束
+				majorId int references major(id)#外键
+			);
+		语法：直接在字段名后面追加约束类型即可，只支持默认、非空、主键、唯一;
+		添加表级约束：	
+			create table 表名(
+				字段名 字段类型 列级约束,
+				字段名 字段类型,
+				constraint pk primary key(字段名),#主键
+				constraint uq unique(字段名),#唯一键
+				constraint fk foreign key(字段名) reference 表名(字段名)#外键
+			);
+	主键和唯一异同点
+		主键和唯一都可以确保唯一；
+		唯一可以为空，主键不可以；
+		主键之多有一个，唯一键则可以有多个；
+		主键和唯一键都可以组合多个字段名使用；
+	外键：
+		要求在从表设置外键关系；
+		从表的外键列的类型和主表的关联列的类型要求一致或兼容，名称无要求；
+		主表中的关联列必须是一个key(一般是主键或唯一键)；
+		插入数据时，先插入主表的数据，删除先删除从表；
+		
