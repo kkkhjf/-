@@ -1,0 +1,126 @@
+1、修改表时添加约束
+	语法：
+		添加列级约束
+			alter table 表名 modify colum 字段名 字段类型 新约束;
+		添加表级约束
+			alter table 表名 add 【constraint 约束名】 约束类型(字段名)【外键的引用】;
+	实例：
+		添加非空约束
+			alter table 表名 modify colum 列名 类型 not null;
+		添加默认约束
+			alter table 表名 modify colum 列名 类型 default 数值;
+		添加唯一
+			alter table 表名 add unique(seat);
+		添加外键
+			alter table 表名 add constraint 约束名 foreign key(majorid) reference major(id);	
+	级联删除
+		on delete cascade
+	级联更新
+		on update cascade
+		
+2、修改表时删除约束
+	删除非空约束
+		alter table 表名 modify colum 字段名 字段类型 null;
+	删除默认约束
+		alter table 表名 modify colum 字段名 字段类型;
+	删除主键
+		alter table 表名 drop primary key;
+	删除唯一
+		alter table 表名 drop index 字段名;
+
+3、标识列
+	含义：可以不用手动地插入值，系统提供默认的序列值;
+	创建表时设置标识列
+		create table 表名(
+			字段名 字段类型 约束条件 auto_increment,
+			...
+		);
+		特点：
+			标识列必须和一个key搭配；
+			一个表中至多有一个标识列；
+			标识列的类型只能是数值型；
+			标识列可以通过set auto_increment_increment=3，设置步长，也可以通过手动插入值，设置初始值；
+	修改表时设置标识列
+		alter table 表名 modify colum 字段名 字段类型 primary key auto_increment;
+	
+	修改表时删除标识列
+		alter table 表名 modify colum 字段名 字段类型;
+
+4、事务
+	含义：一个或一组sql语句组成一个执行单元，这个执行单元要么全部执行，要么全部不执行；
+	ACID属性：
+		原子性：事务是一个不可再分的工作单位；
+		一致性：事务必须使数据库从一个一致性状态变换成另一个一致性状态；
+		隔离性：一个事务的执行不会被其他事务干扰；
+		持久性：一个事务一旦被提交，它对数据库中数据的改变就是永久性的；
+	使用事务的步骤
+		步骤1：开启事务
+			set autocommit=0;
+			start transaction;可选的
+		步骤2：编写事务中sql语句(select insert update delete)
+			语句1,
+			语句2,
+			...
+		步骤3：结束事务
+			commit	  提交事务的执行结果；
+			rollback  数据库 回滚到事务执行的状态；
+	事务的隔离级别
+		脏读
+			对于两个事务T1，T2，T1读取了一斤被T2更新但是还没有提交的字段，之后
+				若T2回滚，T1内读取的内容就是临时无效的；
+		不可重复读
+			对于两个事务T1，T2，T1读取了一个字段，然后T2更新了该字段，之后T1再读取同一个字段，值就不同了；
+		幻读
+			对于两个事务T1，T2，T1从表中读取了一个字段，然后T2在该表中插入了一些新行，之后
+				T1再去读取同一个表，就会多出几行；
+		MySQL关于隔离级别的语句
+			select @@tx_isolation									查看当前的隔离级别
+			set transaction level read committed;					设置MySQL联机的隔离级别；
+			set global transaction isolation level read committed 	设置全局的隔离级别
+		事务的隔离级别
+			read uncommitted：出现脏读、幻读、不可重复读
+			read committed：避免脏读，出现幻读和不可重复读；
+			repeatable read避免脏读、不可重复读，出现幻读；
+			serializable	避免脏读、幻读、不可重复读；
+			MySQL中默认repeatable read，Oracle中默认read committed；
+		事务保存点
+			语法：
+				set autocommit=0;
+				start transaction;
+				savepoint 保存点名;
+				...
+				rollback to 保存点名;
+				
+5、视图
+	含义：虚拟表，在使用视图时动态生成，只保存SQL逻辑，不保存查询结果；
+	应用场景
+		多个地方用到同样的查询结果；
+		改查询结果使用的sql语句比较复杂；
+	语法：
+		create view 视图名
+		as
+		查询语句;
+	视图的修改
+		方式一：
+			create or replace view 视图名
+			as
+			查询语句;
+		方式二：
+			alter view 视图名
+			as 
+			查询语句
+	删除视图
+		drop view 视图名,视图名,...
+	更新视图
+		create or replace 视图名
+		insert into 视图名 values(字段名1,...);
+		update 视图名 set 字段名=值,...;
+		delete from 视图名 where 筛选条件;
+	以下类型的视图不能更新
+		包含关键字：分组函数、distinct、group by、having、union或union all;
+		常量视图；
+		select中包含子查询；
+		join；
+		from一个不能更新的视图；
+		where字句的子查询引用了from子句中的表；
+		
