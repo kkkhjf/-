@@ -1,0 +1,220 @@
+1、变量
+	系统变量
+		含义：变量由系统提供，不是用户定义，属于服务器层面；
+		使用语法：
+			show global|【session】 variables;				查看所有的系统变量；
+			show global|【session】 variables like '%char%'	查看满足条件的部分系统变量
+			show @@global|【session】.系统变量名			查看指定的耨个系统变量名；
+			set global|【session】 系统变量名 = 值；		为某个系统变量赋值（方式一）
+			set @@global|【session】.系统变量名 = 值；		为某个系统变量赋值（方式二）
+		注意：
+			如果是全局级别，则需要加上global，如果为会话级别则需要加上session，如果不写则默认session；
+		全局变量
+			作用域：
+				服务器每次启动将为所有的全局变量赋初始值，针对于所有的会话(连接)有效，但不能跨重启；
+		会话变量
+			作用域：仅仅针对于当前会话(连接)有效；
+	自定义变量
+		使用步骤：
+			声明、赋值、使用；
+		用户变量
+			作用域：针对于当前会话(连接)有效，同于会话变量的作用域，应用在begin-end之间的范围；
+			声明并初始化
+				set @用户变量名=值；方式一
+				set @用户变量名:=值；方式二
+				select @用户变量名:=值；方式三
+		局部变量
+			作用域：仅仅在定义它的begin-end中有效,应用在begin-end的第一句话；
+			声明：
+				declare 变量名 类型 【default 值】;
+			赋值：
+				方式一(通过select或set)
+					set 局部变量名=值;
+					set 局部变量名:=值;
+					select @局部变量名:=值;
+				方式二(通过select into)
+					select 字段名 into 局部变量名
+					from 表;
+			
+2、存储过程和函数
+	存储过程
+		含义：一组预先编译的sql与的集合，理解成批处理语句；
+		特点：
+			提高代码的重用性；
+			简化操作；
+			减少了编译次数并且减少了和数据库服务器的连接次数，提高了效率；
+		创建语法
+			create procedure 存储过程名(参数列表)
+			begin
+				存储过程体(一组合法的sql语句)
+			end
+			注意：	参数列表包含三个部分
+						参数模式  参数名  参数类型
+						举例：in stuname varcar(20)
+						参数模式：in（该参数可以作为输入）、out（该参数可以作为输出）、inout（该参数输入输出都可以）
+					如果存储过程体只有一条语句，begin-end可以省略；
+					存储过程中的每条sql语句的结尾都要加上粉好，存储过程的结尾可以使用delimiter重新设置，delimiter  结束符号；
+			调用语法
+				call 存储过程名(实参列表)
+			创建空参列表的存储过程
+				案例1：向admin表中插入5条数据
+					delimiter $
+					create procedure mypro1()
+					begin
+						insert into admin(username,'password')
+						values('jack',0000),('tom',0000),('jason',0000);
+					end $
+					调用
+						call mypro1();
+			创建带in模式参数的存储过程
+				案例1：根据女神名查询对应的男神信息
+					create procedure mypro2(in beautyName varchar(20))
+					begin
+						select bo.*
+						from boys bo
+						right join beauty b on bo.id=b.boyfriend_id
+						where b.name=beatuName;
+					end $
+					调用
+						call mypro2(输入对应的类型即可)
+				案例2：判断用户是否登录成功
+					creat procedure mypro3(in username varchar(20),in password varchar(20))
+					begin
+						declare result varcar(20)
+						select count(*) into result
+						from admin
+						where admin.username=username and admin.password=password;
+						 
+						select if(result>0,'成功','失败');
+					end $
+					调用
+						call mypro3('张飞','888888')
+			创建带out模式的存储过程
+				案例1：根据女神名返回对应的男神名
+					create procedure mypro4(in beautyName varcar(20),out boyName varchar(20))
+					begin
+						select bo.boyName into boyName
+						from boys bo
+						inner join beauty b on bo.id=b.boyfriend_id
+						where b.name=boyName
+					end $
+					调用
+						call mypro4('小昭',@bName)$
+						select @bName$
+			创建带有inout模式参数的存储过程
+				案例1：传入a和b两个值，最终a和b都翻倍并返回
+				create procedure mypro5(inout a int,inout b int)
+				begin
+					set a=a*2;
+					set b=b*2;
+				end $
+				调用	
+					set @n=10$
+					set @m=20$
+					call mypro5(m,n)$
+		删除存储过程
+			drop procedure 存储过程名
+		查看存储过程信息
+			show create procedure 存储过程名;
+	函数
+		存储过程和函数的区别
+			存储过程可以有0个或多个返回；
+			函数只能有一个返回；
+		创建语法
+			create function 函数名(参数列表) return 返回类型
+			begin
+				函数体;
+			end
+			注意：使用delimiter设置结束标记；
+		调用语法
+			select 函数名(参数列表)	
+			无参返回
+				案例1：返回员工的个数
+				delimiter $
+				create function myf1()
+				begin
+					declare c int default 0;#定义局部变量
+					select count(*) into c;
+					from employees;
+					return c;
+				end $
+				调用
+					select myf1()$
+			有参有返回
+				案例2：根据员工名，返回他的工资
+				create function myf2(empName varchar(20)) return double
+				begin
+					set @sal=0;#定义用户变量
+					select salary into sal
+					from employees
+					where last_name=empName;
+					return sal
+				end $
+				调用	
+					select myf2(员工名) $
+		查看函数
+			show create function 函数名;
+		删除函数
+			drop function 函数名; 
+
+3、流程控制结构
+	分支结构
+		if分支结构
+			语法：
+				if(表达式1,表达式2,表达式3)
+					如果表达式1成立，则返回表达式2的值，否则返回表达式3的值；
+				应用在begin-end中的if分支结构
+					if 条件1 then 语句1;
+					elseif 条件2 then 语句2;
+					...
+					else 语句n;
+					end if;
+		case分支结构(放在begin-end中需要加上end case)
+			情况1：类似于switch语句，一般用于实现等值判断；
+				语法：
+					case 变量|表达式|字段名
+					when 要判断的值1 then 返回值1或语句1
+					when 要判断的值2 then 返回值2或语句2
+					when 要判断的值3 then 返回值3或语句3
+					...
+					else 要返回的值n或语句n
+					end case;
+			情况2：类似于多重if结构，一般用于实现区间判断；
+				语法：
+					case
+					when 要判断的条件1 then 返回值1或语句1
+					when 要判断的条件2 then 返回值2或语句2
+					when 要判断的条件3 then 返回值3或语句3
+					...
+					else 要返回的值n或语句n
+					end case;
+	循环结构
+		分类：while、loop、repeat
+		循环控制：
+			iterate 类似于continue； 
+			leave 	类似与break；
+		while循环结构
+			语法：	
+				【标签:】while 循环条件 do
+					循环体
+				end while 【标签】;
+		loop循环控制结构
+			语法：
+				【标签:】loop
+					循环体;
+				end loop【标签】;
+		repeat循环结构
+			语法：
+				【标签:】repeat
+					循环体;
+				until 结束循环的条件
+				end repeat【标签】
+		案例1：向admin表中批量插入数据
+		create procedure pro_while(in insertCount int)
+		begin
+			declare i int default 1;
+			while i<=insertCount do
+				insert into admin(username,'password') values(concat('Rose',i),'777');
+				set i=i+1;#类似与i++
+			end while;
+		end $
