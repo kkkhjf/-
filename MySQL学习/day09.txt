@@ -1,0 +1,97 @@
+ 1、Linux下的MySQL
+	MySQL命令
+		service mysql stop		关闭mysql服务
+		service mysql start		开启mysql服务
+		mysql -u 用户名 -p		输入密码登录
+		chkconfig mysql on		设置mysql开机自启
+		ntsysv					检查mysql服务是否设置未开机自启
+		ps -ef|grep mysql
+	MySQL中数据库的保存位置
+		/var/lib/mysql/ 	mysql数据库文件的存放路径
+		/usr/share/mysql	配置文件目录
+		/usr/bin			相关命令目录
+		/etc/init.d/mysql	启停相关脚本 
+	数据库文件
+		二进制文件log-bin（主从复制）
+		错误日志log-error（默认是关闭，记录严重的警告和错误，每次启动和关闭的详细信息）
+		查询日志log（默认关闭，记录查询的sql语句，如果开启会减低mysql的整体性能，因为记录日志也是需要消耗系统资源）
+		数据文件
+			frm文件（存放表结构）
+			myd文件（存放数据）
+			myi文件（存放表索引）
+
+2、索引
+	定义：帮助MySQL高效获取数据的数据结构，简单的说就是排好序的快速查找数据结构，
+		  除了数据之外，数据库系统还维护着满足特定查找算法的数据结构，这些数据结构以某种方式引用数据，
+		  这样就可以在这些数据结构的基础上实现高级查找算法；
+	索引的结构
+		MySQL中的索引如果没有特别说明指的是B树结构索引，包括聚集索引、次要索引、覆盖索引、复合索引和前缀索引；
+	
+	索引优势
+		提高数据检索的效率（降低了数据库的IO成本），降低了数据排序的成本（降低CPU的消耗）；
+	索引劣势
+		索引也是一张表，表保存了主键与索引字段，并指向实体表的记录，索引列叶璇哟占用空间；
+		索引提高了查询速度。同时却会降低更新表的速度；
+		索引只是提高效率的一个因素；
+	索引分类
+		单值索引：一个索引只包含单个列，一个表可以有多个单值索引；
+		唯一索引：索引列的值必须唯一，单允许有空值；
+		复合索引：一个索引包含多个列；
+	语法：
+		创建
+			CREATE [UNIQUE] INDEX indexname ON mytable(columnname(length));
+			ALTER mytable ADD [UNIQUE] INDEX [indexname] ON (columnname(length));
+		删除
+			DROP INDEX [indexname] ON mytable
+		查看
+			SHOW INDEX FROM table_name
+	mysql索引结构
+		BTree索引、Hash索引、full-text索引、R-Tree索引
+	建立索引
+		主键自动建立唯一索引；
+		频繁作为查询条件的字段应该创建索引；
+		查询中与其它表关联的字段，外键关系建立索引；
+		频繁更新的字段不适合创建索引；
+		查询中排序的字段；
+		查询中统计或分组字段；
+		经常增删改的表；
+		如果每个数据列包含许多重复的内容，为它建立索引就没有太大的实际效果；
+3、explain关键字
+	含义：使用explain故拿剪子可以模拟优化器执行SQL查询语句，从而知道MySQL是如何处理SQL语句；
+	explain部分字段：
+		id 显示表的读取顺序；
+		select_type 数据读取操作的操作类型；
+		哪些索引可以使用；
+		哪些索引被实际使用；
+		表之间的引用；
+		每张表有多少行被优化器查询；
+	语法：
+		explain+SQL语句；
+	字段说明
+		id：select查询的序列号，包含一组数字，表示查询中执行select子句或操作表的顺序，id值越大优先级越高，平级按顺序执行
+			三种情况
+				id相同，执行顺序由上至下；
+				如果是子查询，id的序号会递增，id值越大优先级越高，越先被执行；
+				id相同数值大的执行，相同时按顺序执行；
+		select_type：常用值simple、primary、subquery、derived、union、union result
+			simple：简单select查询，查询中不包含子查询或union；
+			primary：查询中若包含复杂的子部分，外层部分被标记为primary；
+			subquery：在select或where列表中包含子查询；
+			derived：在from列表中包含子查询被标记为derived
+			union：若第二个select出现在union之后，则标记为union；
+			union result：从union表获取结果的select；
+		table：显示本次查询使用到哪张表；
+		type：显示访问类型，结果值最好到最坏（system>const>eq_ref>ref>range>index>ALL），一般来说至少到达range级别；
+			system：表只有一行记录，const类型的特例，平时不会出现；
+			const：表示通过索引一次就找到，const用于比较primary key或unique索引；
+			eq_ref：唯一性索引扫描，对于每个索引键，表中只有一条记录与之匹配；
+			ref：非唯一性索引扫描，返回匹配某个单独值得所有行，本质上也是一种索引访问，它返回所有匹配某个单独值的行，也可能找到多个符合条件的行；
+			range：只检索给定返回的行，使用一个索引来选择行，key列显示使用了哪个索引一般就是在你的where语句中出现了between、<、>、in等的查询；
+			index：index与all的区别是index只遍历索引树；
+			all：将全表扫描一遍；
+		possible_keys：显示可能应用在这张表中的索引，但不一定被使用；
+		key：与possible_keys搭配使用，表示实际使用的索引，如果为NULL，则没有使用索引，查询中若使用了覆盖索引，则该索引出现在key列表中；
+			覆盖索引：查询的字段都有索引；
+		key_len：索引中使用的字节数，显示的值为索引字段的最大可能长度，并非实际使用长度，即key_len是根据表定义计算而得，不是通过表内检索出的；
+		ref：显示索引的哪一列被使用了，如果可能的话是一个常数，哪些列或常量被用于查找索引列上的值；
+		rows：根据表统计信息及索引选用情况，大致估算出找到所需的记录所需要读取的行数；
