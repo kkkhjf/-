@@ -1,0 +1,93 @@
+1、慢查询日志
+	含义：用来记录MySQL中响应时间超过阀值的语句，具体指运行时间超过long_query_time值（默认为10）得SQL语句；
+	说明：默认情况下是关闭状态，需要手动开启；
+	开启命令：
+		show variables like '%slow_query_log%';显示慢查询日志状态
+		show variables like '%long_query_time%';显示当前慢查询时间
+		show global status like '%slow_queries%'显示达到慢查询语句的次数
+		set global slow_query_log=1;(只针对当前数据库有效，MySQL重启后即回复默认)
+		set global long_query_time=x;(更改慢查询限定时间，需要重新打开一个会话才能看到值改变)
+	永久开启慢查询日志
+		在mysqld下配置（my.cnf）slow_query_log=1; slow_query_log_file=/var/lib/mysql/localhost-slow.log; long_query_time=3; log_output=FILE;
+	日志分析工具mysqldumpslow
+		mysqldumpslow命令参数
+			s：按照何种方式排序；
+			c：访问次数；
+			l：锁定时间；
+			r：返回记录；
+			t：查询时间；
+			al：平均锁定时间；
+			ar：平均返回记录数；
+			at：平均查询时间；
+			t：返回前面多少条的数据；
+			g：后面搭配一个正则匹配模式，不区分大小写；
+		案例
+			得到返回记录集最多的10个sql
+				mysqldumpslow -s r -t 10 /var/lib/mysql/localhost-slow.log
+			得到访问次数最多的10个sql
+				mysqldumpslow -s c -t 10 /var/lib/mysql/localhost-slow.log
+			得到按照时间排序的前10条里包含左连接的查询语句
+				mysqldumpslow -s t -t 10 -g "left join" /var/lib/mysql/localhost-slow.log
+
+2、批量插入数据脚本
+	创建函数会报错：This funciton has none 偶发DETERMINISTIC...
+	由于开启过慢查询日志，因为开启了bin-log
+		set global log_bin_trust_functio，所以必须要为创建的function指定一个参数
+		show variables like 'log_bin_trust_function_creators';n_creators=1;
+		当数据库重启上述参数会恢复原样，如果想永久修改则需修改配置文件my.cnf
+			[mysqld]后加上log_bin_trust_function_creators=1
+	创建存储过程
+		delimiter $$
+		create procedure insert_emp(in start int(10), in max_num int(10))
+		begin
+		declare i int default 0;
+		set autocommit=0; #将自动提交关闭
+		repeat
+		set i=i+1;
+		insert into emp(empno,ename,job,mgr,hiredate,sal,comn,deptno) values
+		((start+i),read_string(6),'salman',0001,curdate(),2000,400,read_num());
+		until i=max_num
+		end repeat;
+		commit;
+		end $$
+
+3、使用Show Profile进行sql分析
+	步骤
+		首先开启慢查询日志，提取执行慢的sql；
+		使用explain对有问题的sql进行分析；
+		使用Show Profile进行进一步的分析；
+	Show Profile含义：
+		mysql提供可以用来分析当前会话中语句执行的资源消耗情况，可以用于SQL的调优测量；
+		默认情况下参数处于关闭状态，并保存最近15次的运行结果；
+	使用Show Profile分析的步骤
+		是否支持，看看当前的MySQL版本是否支持,默认关闭；
+			show variables like 'profiling';
+		打开Show Profile
+			set profiling=on;
+		运行SQL；
+		使用Show Profile显示执行过的sql，包含执行时间和执行的语句内容；
+		诊断sql
+			show profile cpu,block io for query 上一步前面的有问题的竖sqlid;
+			参数列表
+				all					显示所有的开销信息；
+				block io			显示块io相关开销；
+				context switches	上下文切换相关开销；
+				cpu					显示cpu相关信息开销；
+				ipc					显示发送和接受相关开销信息；
+				memory				显示内存相关开销信息；
+				page faults			显示页面错误相关开销信息；
+				source				显示和source_function,source_file,source_line相关的开销信息；
+				swaps				显示交换次数的相关开销的信息；
+			查询结果中的重要步骤
+				converting HEAP to MyISAM	查询结果太大，内存不够用往磁盘上搬；
+				creating tmp table			创建临时表（拷贝数据到临时表；用完再删除）；
+				copying to tmp table disk	把内存中的临时表复制到磁盘；
+				locked						锁了；
+
+4、全局查询日志（测试环境使用）
+	set global generar_log=1;
+	set global log_output='TABLE';
+	将编写的sql语句都将贵记录到mysql库里的general_log表中，可以使用一下命令查看
+		select * from mysql.general_log;
+		
+	
