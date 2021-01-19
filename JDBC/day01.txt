@@ -1,0 +1,115 @@
+1、JDBC概述
+	数据的持久化：数据持久化意味着将内存中的数据保存到硬盘上加以固化，而持久化的过程大多使用数据库来实现；
+	数据持久化技术
+		JDBC、JDO、第三方O/R工具（Mybatis）
+	JDBC体系层次
+		面向应用的API：Java api，抽象接口，供应用程序开发人员使用；
+		面向数据库的API：Java Driver api，供开发商开发数据库驱动程序使用；
+	JDBC编程步骤
+		创建Connection对象
+		创建Statement对象
+		执行SQL语句
+		关闭ResultSet对象
+		使用RseultSet对象
+		关闭Statement对象
+		关闭connection对象
+		Over
+
+2、获取数据库连接
+	方式一
+		导入mysql-connector-java包，使用连接数据库的接口；
+			创建Driver对象；
+				Driver driver = new com.mysql.jdbc.Driver();
+			创建Properties对象，保存用户名和密码（键值对）；
+				Properties info = new Properties();
+				info.setProperty("user","root");
+				info.setProperty("password","123456");
+			创建Connection对象;
+				Connection conn = driver.connect(url,info);
+			URL
+				JDBC URL用于标识一个驱动程序，驱动程序管理器通过这个url选择正确的驱动程序，从而建立到数据库的连接；
+				JDBC URL由三部分组成 协议：子协议：子名称
+					协议：JDBC中的协议总是jdbc；
+					子协议：用于标识一个数据库驱动程序；
+					子名称：一种标识数据库的方式，子明称的目的是为了定位数据库提供足够的信息；
+					jdbc:mysql//localhost:3306/test
+					协议  子协议    子名称
+		案例
+			public void testConnection1() throws SQLException {
+				Driver driver = new com.mysql.jdbc.Driver();
+				//jdbc:mysql: 协议
+				//localhost   ip地址
+				//3306        端口号
+				//test        数据库名
+				String url = "jdbc:mysql://localhost:3306/test";
+				//将用户名和密码封装在Properties中，里面是键值对
+				Properties info = new Properties();
+				info.setProperty("user","root");
+				info.setProperty("password","123456");
+				//获取于数据库的连接
+				Connection conn = driver.connect(url,info);
+				System.out.println(conn);
+			}	
+	方式二：对方式一的迭代，在程序中不出现第三方的api使得程序有更好的移植性
+		案例
+			public void testConnection2() throws Exception{
+				//获取Driver实现类对象，使用反射
+				Class clazz = Class.forName("com.mysql.jdbc.Driver");
+				Driver driver = (Driver) clazz.newInstance();
+				//提供要连接的数据库
+				String url = "jdbc:mysql://localhost:3306/test";
+				//提供要连接的用户名和密码
+				Properties info = new Properties();
+				info.setProperty("user","root");
+				info.setProperty("password","123456");
+				//获取连接
+				Connection conn = driver.connect(url,info);
+				System.out.println(conn);
+			}
+	方式三：使用DriverManage替换Driver
+		案例
+			public void testConnection3() throws Exception {
+				//获取Driver实现类的对象
+				Class clazz = Class.forName("com.mysql.jdbc.Driver");
+				Driver driver = (Driver) clazz.newInstance();
+				//提供另外三个参数
+				String url = "jdbc:mysql://localhost:3306/test";
+				String user = "root";
+				String password = "123456";
+				//注册驱动
+				DriverManager.registerDriver(driver);
+				//获取连接
+				Connection conn = DriverManager.getConnection(url,user,password);
+				System.out.println(conn);
+			}
+	方式四：使用配置文件保存四个基本信息，连接数据库（实现了数据与代码的分离）
+		案例
+			public void getConnextion4() throws Exception {
+				//读取配置文件的四个基本信息
+				InputStream resourceAsStream = Connectiontest.class.getClassLoader().getResourceAsStream("jdbc.properties");
+				Properties properties = new Properties();
+				properties.load(resourceAsStream);
+				String user = properties.getProperty("user");
+				String url = properties.getProperty("url");
+				String password = properties.getProperty("password");
+				String driveClass = properties.getProperty("driverClass"); 
+				//加载驱动
+				Class.forName(driveClass);
+				//获取连接
+				Connection connection = DriverManager.getConnection(url, user, password);
+				System.out.println(connection);
+			}
+
+3、使用PreparedStatement实现CRUD操作
+	操作和访问数据库
+		数据库连接被用于向数据库服务器发送命令和SQL语句，并接受数据库服务器返回的结果。其实一个数据库连接就是一个Socket连接；
+		java.sql包中有3个接口分别定义了对数据库的调用的不同方式
+			Statement：用于执行静态SQL语句并返回它所生成结果的对象；
+			PreparedStatement：SQL语句被预编译并存储在此对象中，可以使用此对象多次高效地执行该语句；
+			CallableStatement：用于执行SQL存储过程；
+	Statement的弊端
+		存在拼串操作，繁琐；
+		存在SQL诸如问题；
+			只需要使用PreparedStatement替换Statement就可以避免SQL注入；
+	使用PreparedStatement实现数据库的增删改操作
+		
