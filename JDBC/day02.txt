@@ -1,0 +1,100 @@
+1、使用PreparedStatement连接数据库
+	获取数据库连接
+		InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream("jdbc.properties");
+        Properties pros = new Properties();
+        pros.load(is);
+        String user = pros.getProperty("user");
+        String password = pros.getProperty("password");
+        String url = pros.getProperty("url");
+        String driverClass = pros.getProperty("driverClass");
+        Class.forName(driverClass);
+        connection = DriverManager.getConnection(url, user, password);
+	预编译sql语句，返回PreparedStatement实例（向数据库传入sql语句）
+		String sql = "insert into customers(name,email,birth) values(?,?,?)";//?占位符
+        preparedStatement = connection.prepareStatement(sql);
+	填充占位符
+        preparedStatement.setString(1,"何剑锋");
+        preparedStatement.setString(2,"1814951393@qq.com");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = simpleDateFormat.parse("1998-12-29");
+        preparedStatement.setDate(3, new java.sql.Date(date.getTime()));
+	执行操作
+		preparedStatement.execute();
+	资源关闭
+		try {
+            if(preparedStatement != null)
+                preparedStatement.close();
+        } catch (SQLException throwables) {
+                throwables.printStackTrace();
+        }
+        try {
+            if(connection != null)
+                connection.close();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+2、使用PreparedStatement对数据库执行select操作
+	select操作与增删改操作基本一致，只不过执行时返回一个结果集；
+	select操作与增删改操作的不同
+		select的执行操作
+			ResultSet resultSet = ps.executeQuery();
+		处理结果集(类似于集合的迭代器)
+			if(resultSet.next()){
+				//判断结果集下一条是否有数据
+				int id = resultSet.getInt(1);
+				String name = resultSet.getString(2);
+				String email = resultSet.getString(3);
+				Date birth = resultSet.getDate(4);
+				//将返回的结果集封装在对象里（创建一个对象用来保存返回的结果集）
+				Customer cus = new Customer(id,name,email,birth);
+			}
+	select查询的通用写法
+		返回字段名时建议使用ResultSetMetaData.getColumnLabel()方法，即便没有别名也会返回字段名；
+		try {
+            connection = JDBCUtils.getConnection();
+            preparedStatement = connection.prepareStatement(sql);
+
+            for (int i = 0; i < args.length; i++) {
+                preparedStatement.setObject(i+1,args[i]);
+            }
+			//执行，获取结果集
+			resultSet = preparedStatement.executeQuery();
+			//获取结果集的元数据
+			ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+			int columnCount = resultSetMetaData.getColumnCount();
+			if(resultSet.next()){
+				Order order = new Order();
+				for (int i = 0; i < columnCount; i++) {
+					//获取每个列的列值：通过ResultSet
+					Object columnValue = resultSet.getObject(i+1);
+					//获取每个列的列名：通过ResultSetMetaData.getColumnName(int index);
+					//String columnName = resultSetMetaData.getColumnName(i+1);
+					//获取每个列的别名：通过ResultSetMetaData.getColumnLabel(int index);(不起别名则会直接返回字段名)
+					String columnName = resultSetMetaData.getColumnLabel(i+1);
+					//通过反射，将对象执行名columnName的属性赋值为指定的columnValue
+					Field declaredField = Order.class.getDeclaredField(columnName);
+					declaredField.setAccessible(true);
+					declaredField.set(order,columnValue);
+				}
+				return order;
+			}
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }finally {
+            JDBCUtils.closeResource(connection,preparedStatement,resultSet);
+        }
+        return  null;
+3、sql类型与java类型的转换
+	BIT							boolean
+	TINTINT						byte
+	SMALLINT					short
+	INTEGER						int
+	BIGINT						long
+	CHAR,VARCHAR,LONGVARCGAR	String
+	BINARY,VAR BINARY			byte array
+	DATE						java.sql.Date
+	TIME						java.sql.Time
+	TIMESTAMP					java.sql.Timestamp
+	
