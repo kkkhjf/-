@@ -1,0 +1,44 @@
+1、JDBC查询过程
+	利用ORM编程思想(Object Relational Mapping)
+		一个数据表对应一个Java类；
+		表中的一条记录对应Java类的一个对象；
+		表中的一个字段对应Java类的一个属性；
+	获取查询的结果集再获取结果集中的每一条数据，利用ORM和反射将每一条数据变成一个对象；
+
+2、使用PreparedStatement实现查询的不同表的通用操作
+	返回单条数据
+		将Query方法设置为泛型方法；
+		将指定的类用反射代替；
+	返回多条数据
+		将每条数据对应的对象保存在集合里；
+
+3、PreparedStatement解决SQL注入问题
+	在预编译的时候就已经把查询条件中的或且关系确定了；
+	
+4、操作Blob类型数据
+	MySQL四种Blob类型数据
+		TinyBlob	最大255字节
+		Blob		最大65KB
+		MediumBlob	最大16MB
+		LongBlob	最大4GB
+	插入/修改操作
+		将要插入的文件以流的形式插入/修改到数据库中
+			FileInputStream is = new FileInputStream(new File("ASLD.png"));
+			ps.setBlob(index,is);
+	查询数据库中的Blob字段
+		Blob photo = rs.getBlob("photo");
+		InputStream is = photo.getBinaryStream();
+		FileOutputStream fos = new FileOutputStream("abc.jpg");
+		byte[] buffer = new byte[1024];
+		int len;
+		while((len = is.read(buffer)) != -1){
+			fos.write(buffer,0,len);
+		}
+	Blob字段要在my.ini中修改属性才能达到最大值
+		max_allowed_packet = 16M(以MediumBlob为例，修改完后要将MySQL服务重启)
+
+5、使用PreparedStatement实现批量数据操作
+	MySQL默认关闭批处理，需要通过修改配置文件实现支持批处理功能
+		?rewriteBatchedStatements=true 写在配置文件的url后面；
+	使用PreparedStatement来批量插入可以更高效，因为预编译的语句在DBServer的编译器编译后的执行代码被缓存下来，
+		下一次调用时只是要相同的预编译语句就不需要编译，只要将参数直接传入编译好的语句执行代码中就会得到执行；
