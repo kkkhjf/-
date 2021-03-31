@@ -1,0 +1,51 @@
+1、Cookie
+	服务器通知客户端保存键值对的一种技术；
+	客户端有了Cookie后，每次请求都发送给服务器；
+	每个Cookie的大小不能超过4kb；
+	创建Cookie
+		Servlet中调用创建Cookie的方法
+		创建Cookie对象
+			Cookie cookie = new Cookie("key1","value1");
+		通知客户端保存Cookie
+			resp.addCookie(cookie); 
+	服务器获取客户端的Cookie
+		在方法中使用Cookie[] cookie = req.getCookies();
+		cooki.getName()、cookie.getValue()获取Cookie的名称和值；
+		注：需要找到某一个Cookie只能通过遍历的方式进行查找；
+	修改Cookie的值
+		先找到需要的Cookie再使用setValue()方法更新Cookie；
+		注：修改Cookie的值后要使用addCookie()方法重新通知客户端保存Cookie；
+	Cookie的生命控制
+		setMaxAge()
+			正数表示在指定的秒数后过期；
+			负数表示浏览器一关闭Cookie就会被删除（默认值是-1）；
+			0表示马上删除Cookie；
+	Cookie有效路径Path设置
+		Cookie的path属性可以有效的过滤哪些Cookie可以发送给浏览器，哪些不发；
+		path属性是通过请求的地址来进行有效的过滤；
+		Cookie.setPath()方法设置Cookie的有效路径；
+
+2、Session会话
+	Session就是一个接口(HttpSession)；
+	Session用来维护一个客户端和服务器之间关联的一种技术；
+	每个客户端都有子的的一个Session会话；
+	Session会话经常用来保存用户登录后的信息；
+	Session的创建和获取
+		request.getSession()
+			第一次调用是创建Session会话；
+			之后的调用都是获取创建好的Session会话对象；
+			注：使用isNew()方法可以判断Session会话是否是第一次创建；
+		request.getid()得到Session会话的id值
+			每个会话都有一个唯一的id值；
+	Session域数据的存取
+		req.getSession().setAttribute("key1","value1");
+		req.getSession().getAttribute("key1");
+	Session生命周期控制
+		setMaxInactiveInterval(int interval) 设置Session的超时时间（以秒为单位），正数为超时时长，负数为永不超时；
+		getMaxInactiveInterval()			 获取Session的超时时间（以秒为单位）；
+		invalidate()						 Session超时时长为0； 
+		注：Session默认的超时时长为30分钟，因为在Tomcat的web.xml文件中已经配置好了超时时长；
+			Session超时指的是两次请求的间隔时长；
+	浏览器和Session之间的关联
+		服务器每次创建Session会话时，都会创建一个Cookie对象，这个Cookie对象的key永远都是：JSESSIONID，值是新创建出来的Session的id值；
+		通过Cookie中的id值找到自己之前创建好的Session对象，并返回；

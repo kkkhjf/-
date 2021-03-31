@@ -1,0 +1,80 @@
+1、Filter过滤器
+	Filter过滤器是JavaWeb三大组件之一：Servlet程序、Listener监听器、Filter过滤器；
+	Filter过滤器它是JavaEE的规范，也就是接口；
+	Filter过滤器他的作用是拦截请求，过滤响应；
+		拦截请求常见的应用场景有：权限检查、日记操作、事务管理等；
+	Filter过滤器使用
+		实现Filter接口；
+		重写doFilter方法；
+			@Override
+			public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+				HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
+
+				Object user = httpServletRequest.getSession().getAttribute("user");
+
+				if (user == null) {
+					httpServletRequest.getRequestDispatcher("/pages/user/login.jsp").forward(servletRequest,servletResponse);
+				} else {
+					//让程序继续执行，没有这行代码则无法继续执行
+					filterChain.doFilter(servletRequest,servletResponse);
+				}
+			}
+		在web.xml文档中配置Filter过滤器
+			<!--filter标签用于配置一个Filter过滤器-->
+			<filter>
+				<!--给filter起一个别名-->
+				<filter-name>ManagerFilter</filter-name>
+				<!--配置filter的全类名-->
+				<filter-class>com.atguigu.filter.ManagerFilter</filter-class>
+			</filter>
+			<!--filter-mapping配置Filter过滤器的拦截路径-->
+			<filter-mapping>
+				<!--filter-name表示当前的拦截路径给哪一个filter使用-->
+				<filter-name>ManagerFilter</filter-name>
+				<!--url-pattern配置拦截路径-->
+				<url-pattern>/pages/manager/*</url-pattern>
+				<url-pattern>/manager/bookServlet</url-pattern>
+			</filter-mapping>
+	Filter过滤器的生命周期
+		构造器方法；
+		init初始化方法；
+			第1，2步再web服务器启动的时候创建（Filter已经创建）；
+		doFilter过滤方法；
+			每次拦截到请求就会执行；
+		destroy销毁方法；
+			停止web工程的时候，就会执行（停止的时候也会销毁Filter过滤器）
+	FilterConfig类
+		FilterConfig类是Filter过滤器的配置文件类，Tomcat每次创建Filter的时候，
+			同时也会创建一个FilterConfig类，包含了Filter配置文件的配置信息；
+		FilterConfig类的作用是获取filter过滤器的配置内容
+			获取Fliter的名称filter-name的内容；
+				FilterConfig.getFilterName();
+			获取在Filter中配置的init-param初始化参数；
+				FilterConfig.getInitParameter();
+			获取ServletContext对象；
+				FilterConfig.getServletContext();
+	FilterChain过滤器链
+		FilterChain.doFilter1()方法的作用
+			执行下一个Filter过滤器（如果有Filter）；
+			执行目标资源（没有Filter）；
+			代码执行
+				filterChain.doFilter(servletRequest,servletResponse);
+		在web.xml文档中配置Filter过滤器，同一个过滤链的拦截目标都是相同页面；
+		注：在多个Filter过滤器的执行顺序是由web.xml文档中的配置顺序决定的；
+		所有Filter过滤器和目标资源都默认执行在同一个线程中；
+	Filter的拦截路径
+		精确匹配
+			<url-pattern>具体的某一个页面</url-pattern>
+		目录匹配
+			<url-pattern>/pages/manager/*</url-pattern>
+		后缀名匹配
+			<url-pattern>*.html</url-pattern>
+		注：Filter过滤器它只关心请求的地址是否匹配，不关心请求得资源是否存在。
+ThreadLocal的使用
+	ThreadLocal可以解决多线程的数据安全问题，可以给当前线程关联一个数据（可以是普通变量，也可以是对象，也可以是数据，集合）
+	ThreadLocal特点
+		可以为当前线程关联一个数据（可以像Map那样存取数据，key作为当前线程）；
+		每个ThreadLocal对象，只能为当前线程关联一个数据，入锅想要为当前线程关联多个数据，就绪使用多个ThreadLocal对象实例；
+		每个ThreadLocal对象实例定义的时候，一般都是static类型；
+		ThreadLcoal中保存的数据在线程销毁后会自动回收；
+		使用同一ThreadLocal实例对象关联线程时，以最后一次关联的数据为准；
