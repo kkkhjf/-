@@ -1,0 +1,113 @@
+1、JSON
+	JSON是一种轻量级的数据交换格式；
+	JSON在JavaScript中的使用
+		json的定义
+			json是由键值对组成，并且由花括号包围，每个键由引号引起来，键和值之间使用冒号分隔，多组键值对之间使用逗号进行分隔；
+				var jsonObj = {
+					"key1":123,
+					"key2":"abc",
+					"key3":true,
+					"key4":[11,"arr",false],
+					"key5":{
+						"key5_1":511,
+						"key5_2":"key5_2_value"
+					},
+					"key6":[{
+						"key6_1_1":6111,
+						"key6_1_2":"key6_1_2_value"
+					},{
+						"key6_2_1":6211
+					}]
+				};
+		json的访问
+			json本身是一个对象，json中的key类似于一个对象中的属性，访问json中的key就跟访问对象的属性一样，json对象.key；
+				alert(jsonObj.key1);
+		json的两种常用用法
+			json的存在有两种形式
+				一种是对象的形式存在，一种是字符串的形式存在（两种形式可以相互转换）；
+					JSON.stringify(jsonObj)		把json对象转换成json字符串；
+					JSON.parse(jsonObjString)	把json字符串转换成json对象；
+				注：一般在操作json中的数据时，需要json对象的形式；
+					一般在客户端和服务器之间进行数据交换时，使用json字符串；
+					两种形式的转换过程JSON需要大写形式；
+		json在Java中的使用
+			JavaBean和json的转换
+				导入gsonjar包；
+				利用gson.toJson(Object obj)实现JavaBean到Json的转换；
+				利用gson.fromJson(Json json, Object.class)实现Json到JavaBean的转换；
+			List和json的转换
+				导入gsonjar包；
+				利用gson.toJson(List<Object> list)实现List集合到Json的转换；
+				利用gson.feomJson(Json json, A.getType())需要单独的一个类A继承TypeToken<T>，再使用gettype()获取类型实现Json到List集合的转换；
+			Map和json的转换	
+				导入gsonjar包；
+				利gson.toJson(Map<T,E>)实现Map集合到Json的转换；
+				利用gson.fromJson(Json json, A.getType())需要单独的一个类A继承TypeToken<T>，再使用gettype()获取类型实现Json到Map的转换；
+			注：可以使用匿名内部类来代替单独创建一个类继承TypeToken；
+
+2、AJAX请求
+	AJAX是一种浏览器通过js异步发起请求，局部刷新页面的技术；
+	原生的AJAX请求使用
+		创建XMLHttpRequest对象
+			var xmlHttpRequest = new XMLHttpRequest();
+		调用open方法设置请求参数，请求类型（GET或POST），true异步false同步
+			xmlHttpRequest.open(请求类型,工程路径,是否异步); 
+		调用send方法发送请求
+			xmlHttpRequest.send();
+		注：以上三步完成后即可把请求发送给服务器；
+			服务器在和客户端进行数据交换的时候一般使用json字符串；
+		在send方法前绑定onreadystatechange时间，处理请求完成后的操作，XMLHttpRequest属性readyState（0请求未初始化、1服务器连接已建立、2请求已接受、3请求处理中、4请求已完成，且响应已就绪），status属性（200："OK",404："未找到页面"）
+			xmlHttpRequest.onreadystatechange = function(){
+				if(xmlHttpRequest.readState == 4 && xmlHttpRequest.status == 200){
+					//使用xmlHttpRequest.reponseText获取服务器返回的数据
+					var jsonObj = JSON.parse(xmlHttpRequest.responseText);
+					document.getElementById(id).innerHTML = jsonObj.属性;
+				}
+			}
+		注：Ajax请求的局部更新，浏览器的地址栏不会有变化，局部更新不会舍弃原来的内容；
+	JQery中的AJAX请求
+		$.ajax方法
+			url			表示请求得地址
+			type		表示请求的类型GET或POST
+			data		表示发送给服务器的数据
+						格式有两种
+							name=value&name=value;
+							{key:value};
+			success		请求响应，响应的回调函数
+			dataType	响应的数据类型
+							常用的数据类型（text表示纯文本、xml表示xml数据、json表示json对象）
+			使用案例
+				$.ajax({
+					url:"http://localhost:8080/16_json_ajax_i18n/ajaxServlet",//请求的地址
+					data:"action=jQueryAjax",//发送给服务器的数据
+					type:"GET",//请求的类型
+					success:function(arg){ //响应的回调函数
+						//对返回的数据进行处理
+					},
+					dataType:"text"//响应的数据类型
+				});
+		$.get方法和$.post方法
+			url			请求的地址
+			data		发送的数据
+			callback	成功的回调函数
+			type		返回的数据类型
+			使用案例（$.post方法使用类似）
+				$.get("http://localhost:8080/16_json_ajax_i18n/ajaxServlet","action=jQueryGet",function (data) {
+						$("#msg").html(" get 编号：" + data.id + " , 姓名：" + data.name);
+					},"json");//参数列表：url、data、callback、type
+		$.getJSON方法
+			参数列表：url、data、callback
+			使用案例
+				$.getJSON("http://localhost:8080/16_json_ajax_i18n/ajaxServlet","action=jQueryGetJSON",function (data) {
+						$("#msg").html(" getJSON 编号：" + data.id + " , 姓名：" + data.name);
+					});
+		表单序列化serialze()
+			serialze()可以把表单中所有表单项的内容都获取到，并以name=value&name=value的形似和进行拼接；
+			使用$(formid).serialize()方法可以获取到表单中的所有内容；
+			使用案例
+				$("#submit").click(function(){
+					// 把参数序列化
+					$.getJSON("http://localhost:8080/16_json_ajax_i18n/ajaxServlet","action=jQuerySerialize&" + $("#form01").serialize(),function (data) {
+						$("#msg").html(" Serialize 编号：" + data.id + " , 姓名：" + data.name);
+					});
+				});
