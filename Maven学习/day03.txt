@@ -1,0 +1,59 @@
+1、IDEA中Maven的配置
+	创建Maven工程时先在setting中配置Maven的版本号；
+	创建好Maven工程后要给Maven项目创建好目录结构；
+	Maven命令的执行可以在Add Configuration中配置；
+2、Maven工程配置Tomcat插件
+	在pom.xml文件中配置
+		<build>
+		  <plugins>
+		    <plugin>
+		      Tomcat插件的坐标
+		      <configuration>
+		        插件的配置标签
+		      </configuration>
+		    </plugin>
+		  </plugins>
+		</build>
+3、依赖配置
+	依赖指当前项目运行所需要的jar，一个项目可以设置多个依赖；
+	依赖的配置在pom.xml中完成
+		<dependencies>
+		  <dependency>
+		    依赖配置
+		  </dependency>
+		</dependencies>
+	依赖传递（在<dependency>标签里添加其他Maven工程的坐标即可实现依赖传递）
+		直接依赖
+			在当前项目中通过依赖配置建立的依赖关系；
+		间接依赖
+			被依赖的资源如果依赖其他资源，当前项目间接的依赖其他资源；
+		依赖传递冲突问题
+			路径优先
+				当依赖中出现相同的资源时，层级越深优先级越低；
+			声明优先
+				当资源在相同层级被依赖时，配置顺序靠前的覆盖配置顺序靠后的；
+		可选依赖
+			在<dependency>标签里加上<optional> true </optional>标签即可让当前的依赖对其他Maven工程不可见；
+		排除依赖（断开与其他项目的依赖）
+			在别的项目坐标下添加
+				<exclusions>
+				  <exclusion>
+				    其他项目的坐标（不需要版本号）
+				  <exclusion>
+				</exclusions>  
+		依赖范围传递性
+			间接/直接  compile  test  provided  runtime
+			  compile  compile	test  provided  runtime
+			  test
+			  provided
+			  runtime  runtime  test  provided	runtime
+4、插件
+	插件的参数执行，需要<goals>标签里执行
+		<plugins>
+		  <plugin>
+		    <goals>
+			  <goal> 插件的参数 </goal>
+			  <phase> 插件的执行阶段 </phase>
+			</goals>
+		  <plugin>
+		</plugins>
