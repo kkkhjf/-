@@ -1,0 +1,117 @@
+1、Spring（轻量级的控制反转和面向切面编程的框加）
+	优点
+		开源、轻量级、非入侵式的框架；
+		控制反转（IOC）和面向切面编程（AOP）；
+		支持事务的处理，对框加整合的支持；
+	组成（7大模块）
+		Spring-Core
+			Core包是框架的最基础部分，并提供依赖注入（Dependency Injection）管理Bean容器功能。这里的基础概念是BeanFactory，它提供对Factory模式的经典实现来消除对程序性单例模式的需要，并真正地允许你从程序逻辑中分离出依赖关系和配置；
+		Spring-Context(Spring核心容器<上下文模块>)
+			核心模块的BeanFactory使Spring成为一个容器，而上下文模块使它成为一个框架。这个模块扩展了BeanFactory的概念，增加了消息、事件传播以及验证的支持。另外，这个模块提供了许多企业服务，例如电子邮件、JNDI访问、EJB集成、远程以及时序调度（scheduling）服务。也包括了对模版框架例如Velocity和FreeMarker集成的支持；
+		Spring-Aop
+			Spring在它的AOP模块中提供了对面向切面编程的丰富支持。例如方法拦截器（servletListener ,controller....）和切点，可以有效的防止代码上功能的耦合，这个模块是在Spring应用中实现切面编程的基础。Spring的AOP模块也将元数据编程引入了Spring。使用Spring的元数据支持，你可以为你的源代码增加注释，指示Spring在何处以及如何应用切面函数；
+		Spring-Dao
+			使用JDBC经常导致大量的重复代码，取得连接、创建语句、处理结果集，然后关闭连接、旧代码中迁移自定义工具类JDBCUtil 也让开发变得繁琐。Spring的Dao模块对传统的JDBC进行了抽象，还提供了一种比编程性更好的声明性事务管理方法；
+		Spring-Web
+			Web上下文模块建立于应用上下文模块之上，提供了WEB开发的基础集成特性，例如文件上传。另外，这个模块还提供了一些面向服务支持。利用Servlet listeners进行IOC容器初始化和针对Web的applicationcontext；
+		Spring Web MVC
+			(Model-View-Controller)Spring为构建Web应用提供了一个功能全面的MVC框架。它提供了一种清晰的分离模型，在领域模型代码和web form之间。并且，还可以借助Spring框架的其他特性；
+		Spring-ORM
+			关系映射模块，ORM包为流行的“关系/对象”映射APIs提供了集成层，包括JDO，Hibernate和iBatis（MyBatis）。通过ORM包，可以混合使用所有Spring提供的特性进行“对象/关系”映射，方便开发时小组内整合代码；
+2、IOC理论推到
+	以前的结构是程序主动创建一个对象，控制权在程序员手上，如果在Service层使用向上转型即可让程序主动创建一个对象；
+3、使用Spring创建对象
+	XML创建
+		首先在java目录下的resources目录下创建Spring的配置文件；
+		在<bean></bean>标签中配置一个对象，<bean>中的id作为唯一标识一个类，class表示该类在在哪个包下；
+		<bean>标签间设置该对象的属性(name)，及其值(value)；
+			<bean id="hello" class="com.hejianfeng.Hello">
+				<property name="str" value="Spring"/>
+			</bean>
+		使用ApplicationContext构建Spring的上下文类new ClassPathXmlApplicationContext(String filename)，利用getBean(String id)方法获取实例对象；
+		注：id等于变量名，class等于new的对象，property相当于给对象中的属性设置一个值；
+			xml中配置的类的属性必须要有set方法；
+			对象由Spring来创建，对象的属性由Spring容器设置。这个过程就是控制反转
+				控制：传统应用程序的对象是由程序本身控制的，使用Spring后对象是由Spring来创建；
+				反转：程序本身不创建对象，而变成被动的接收对象；
+				依赖注入：利用set方法来进行注入；
+4、IOC创建对象的方式
+	使用无参构造器创建对象（默认实现）；
+	使用有参构造器创建对象
+		下标赋值（<constructor-arg>标签中的index表示参数的索引，0代表第一个参数，value代表给这个参数进行赋值）
+			<bean id="exampleBean" class="examples.ExampleBean">
+				<constructor-arg index="0" value="7500000"/>
+			</bean>
+		类型赋值（将构造器中所有同类型的参数赋值）不建议使用
+			<bean id="exampleBean" class="examples.ExampleBean">
+				<constructor-arg type="int" value="7500000"/>
+				<constructor-arg type="java.lang.String" value="42"/>
+			</bean>
+		参数名赋值
+			<bean id="exampleBean" class="examples.ExampleBean">
+				<constructor-arg name="years" value="7500000"/>
+				<constructor-arg name="ultimateAnswer" value="42"/>
+			</bean>
+		注：在配置文件加载的时候，容器中管理的对象就已经初始化了；
+			xml里配置的对象，代码中无论引用同一个类多少次都指向同一个对象；
+5、Spring配置
+	别名（<alias/>）
+		<alias name="fromName" alias="toName"/>，name代表已经配置好的对象id，alias表示给这个对象取的别名；
+	Bean配置
+		<bean/>
+			id表示唯一表示，相当于对象名；
+			class表示对象所对应的全限定名（包名+类型）；
+			name表示别名，可以取多个别名中间用逗号、空格或分号分隔；
+		<property/>
+			name表示属性名；
+			value表示默认赋值；
+	导入(import)
+		<import resource="xxx.xml"/>将多个配置文件导入合并为一个；
+6、依赖注入
+	构造器注入（4里说了）
+	Set方式注入
+		依赖：bean对象的创建依赖于容器；
+		注入：bean对象中的属性由容器注入；
+		多种类型的注入，见官方文档；
+		注：idref标签只是获取spring容器中的bean的name的值（一个字符串），而不是bean的实例；
+	拓展方式注入（使用前要在xml中导入命名空间）
+		p命名空间注入（对应Set注入）
+			<bean name="p-namespace" class="com.example.ExampleBean"
+				p:email="someone@somewhere.com"/>
+			将<property name="email" value="someone@somewhere.com"/>直接简化为上面的形式，用命名空间的方式来代替<property/>标签；
+			注：使用p命名空间给一个引用属性赋值时需要在属性名后面加上-ref表示这不是一个直接值，而是对另一个 bean 的引用；
+		c命名空间注入（对应构造器注入）
+			c命名空间允许内联属性来配置构造函数参数而不是嵌套constructor-arg元素；
+			c命名空间注入的作用类似于构造器注入，给引用赋值时类似于p命名空间一样，在参数后面加上-ref；
+7、Bean的作用域
+	单例模式(Spring默认)
+		IOC容器对一个bean只保存一个对象；
+		<bean id="accountService" class="com.something.DefaultAccountService" scope="singleton"/>
+	原型模式（每次从容器中get的时候，都会产生一个新对象）
+		<bean id="accountService" class="com.something.DefaultAccountService" scope="prototype"/>
+	其余的request、session、application这些在web开发中使用；
+8、自动装配
+	Spring会在上下文中自动寻找，并自动给bean装配属性；
+	在Spring中有三种装配方式
+		xml中显示的配置；
+		在Java中显示配置；
+		隐式的自动装配bean；
+	ByName自动装配（在<bean>标签里增加属性autowire="byName"）
+		byName：会在容器上下文中查找和自己对象set方法后买你的值对应的beanid
+	ByType自动装配（autowire属性后加上byType）
+		byType：会自动在容器上下文查找，和自己对象属性类型相同的bean；
+		byType不需要被装配的bean对象有id，只需要保证被装配的bean对象是全局唯一的即可；
+	注：byName的时候，需要保证所有bean的id唯一，并且这个bean需要和自动注入的属性的set方法一致；
+		byType的时候，需要保证所有bean的class唯一，并且这个bean需要和自动注入的属性的类型一致；
+	使用注解实现自动装配
+		使用注解须知
+			导入约束；
+			配置注解的支持(需要引入外部依赖和注解支持（<context:annotation-config/>）)
+		@Autowired
+			使用Autowired注解后就不需要set方法了，只需要get方法，前提是被装配的bean要在IOC容器中存在，且符合名字ByName；
+			如果显示地定义了@Autowired地属性required属性为false，则可以允许改属性为空；
+			如果@Autowired自动装配的环境比较复杂，自动装配无法通过一个注解@Autowired完成的时候我们可以使用@Qualifiler(value="xxx")去配置@Autowired的使用，指定一个唯一的bean对象注入；
+			注：@Resource和@Autowired的区别
+					@Autowired通过byTyme的方式实现；
+					@Resource默认通过byName的方式实现，如果找不到名字，则通过byType实现，如果两个都找不到的情况下就报错；
+					唯一区别：执行顺序不同；
