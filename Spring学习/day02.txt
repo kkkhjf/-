@@ -1,0 +1,25 @@
+1、使用注解开发
+	Spring4后，要使用注解开发，必须保证app的包导入（aop的包）；
+	使用注解需要支持（<context:annotation-config/>）
+	指定要扫描的包，这个包下的注解就会生效（<context:component-scan base-package="完整包名">）
+	注解
+		@Autowire：自动装配通过类型、名字；
+		@Nullable：字段标记了这个注解，说明这个字段可以为null；
+		@Resource：自动装配通过名字、类型；
+		@Component：放在类上，说明这个类被Spring管理了；
+			@Component有几个衍生注解，我们在web开发中，会按照mvc三层架构分层
+				dao：@Repository
+				service：@Service
+				controller：@Controller
+				注：上面这四个注解功能都是一样的，都是代表将某个类注册到Spring，装配bean（不同的层用不同的注解）；
+		@Value(xxx)：给属性配置value，放在属性上；
+		@Scope("xxx")：prototype：原型模式，singtelen：单例模式；
+2、使用Java的方式配置Spring
+	JavaConfig是Spring的一个子项目，在Spring4后。成为了一个核心功能；
+	使用Java配置步骤
+		创建一个类用于配置；
+		在该配置类上使用注解@Configuration；
+			注：使用注解配置时，被配置的类上要加@Component（将被配置的类添加到IOC容器）；
+		在配置类中写一个方法用于注册一个Bean，并加上@Bean注解；
+			注：这个方法的名字相当于bean标签中的id属性，返回值相当于bean标签中的class属性，方法体内return new出来的这个对象；
+	注：如果实用类配置类方式去做，我们就只能通过AnnotationConfig上下文来获取容器，通过配置类的Class对象加载，获取上下文对象的参数填写配置类的.class；
