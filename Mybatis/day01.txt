@@ -1,1 +1,66 @@
-1、
+1、使用Mybatis
+	首先把mybatis的jar包和mysql-connector-java的jar包导入到项目里；
+	接着在项目里创建mybatis的xml文档（群居配置文件）
+		<?xml version="1.0" encoding="UTF-8" ?>
+		<!DOCTYPE configuration
+				PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+				"http://mybatis.org/dtd/mybatis-3-config.dtd">
+		<configuration>
+			<environments default="development">
+				<environment id="development">
+					<transactionManager type="JDBC"/>
+					<dataSource type="POOLED">
+						<property name="driver" value="com.mysql.jdbc.Driver"/>
+						<property name="url" value="jdbc:mysql:localhost:3306/mybatis"/>
+						<property name="username" value="root"/>
+						<property name="password" value="123456"/>
+					</dataSource>
+				</environment>
+			</environments>
+			<mappers>
+				<mapper resource="org/mybatis/example/BlogMapper.xml"/>
+			</mappers>
+		</configuration>
+	根据配置文件获取SqlSessionFactory
+		String resource = "mybatis-config.xml";
+        InputStream inputStream = Resources.getResourceAsStream(resource);
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+	获取sqlSession实例
+		SqlSession session = sqlSessionFactory.openSession()
+	配置sql映射的xml文档
+		<?xml version="1.0" encoding="UTF-8" ?>
+				<!DOCTYPE mapper
+		  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+		<mapper namespace="org.mybatis.example.BlogMapper">
+		  <!-- namespace：名称空间（没有要求），id：唯一标识（映射文档中的id，保险起见是namespace加id），），
+				resultType：返回值类型，#{id}从传过来的参数中取出一个id值，
+		  -->
+		  <select id="selectBlog" resultType="Blog">
+			select * from Blog where id = #{id}
+		  </select>
+		</mapper>
+	使用sqlSession实例（SqlSession 提供了在数据库执行 SQL 命令所需的所有方法）执行已经映射的sql语句；
+		Employee employee = session.selectOne("com.hejianfeng.bean.EmployeeMapper.Employee", 1);
+	关闭连接
+		openSession.close();
+	
+	注：全局配置文件用来创建一个SqlSessionFactory对象（包含一些运行信息）；
+		配置sql映射文件，配置每一个sql，以及sql的封装规则；
+		讲sql映射文件保存在全局配置文件中；
+		代码实现sql语句
+			根据全局配置文件得到的SqlSessionFactory；
+			使用SqlSeeionFactory工厂，获取到sqlSession对象使用该对象来执行增删改查；
+			一个sqlSession就是代表和数据库的一次会话，用完要关闭；
+			使用sql的唯一标识来告诉Mybatis执行哪一个sql，sql都是保存在sql映射文件中；
+
+2、接口式编程
+	将映射文件中的namespace指定为接口的全类名，id改成接口中的方法；
+	获取sqlSessionFactory对象；
+	获取sqlSession对象；
+	获取接口实现类对象
+		SqlSession.getMapper(接口类);
+	通过接口实现类调用接口里的方法，实现sql语句；
+	注：将映射文件与接口绑定，Mybatis会自动地创建一个代理对象，代理对象去执行增删改查方法；
+		SqlSession和Connection一样都是非线程安全的，每次使用都应该去获取新的对象；
+		
