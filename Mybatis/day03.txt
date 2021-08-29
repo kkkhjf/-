@@ -1,0 +1,109 @@
+1、映射文件
+	增删改查
+		映射文件中使用<select/>，<insert/>，<update/>，<delete/>标签可以实现增删查改；
+		取数据使用#{属性名}来获取某一属性的数据；
+		注：mybatis允许增删该直接定义以下类型的返回值（Integer，Long，Boolean，void）；
+			需要手动提交数据；、
+	<insert/>标签
+		属性
+			parameterType：参数类型可以省略；
+			获取自增主键
+				useGeneratedKeys：true表示自增主键值的获取；
+				KeyProerty：指定对应的主键属性，Mybatis获取到主键值后将这个值封装给JavaBean的哪个属性；
+			获取非自增主键（Oracle）
+				<selectKey/>标签
+					属性
+						KeyProperty：获取对应的主键属性；
+						order：决定selectKey中的语句是在insert前执行还是insert后执行（AFTER/BEFORE）；
+						resultType：返回主键的数据类型；
+	参数处理
+		单个参数
+			#{参数名}：取出参数值；
+		多个参数
+			Mybatis会做特殊处理，多个参数会被封装成一个map（key的名称从param1开始，value就是对应的值），#{}就是从map中获取指定的值；
+			#{param1}：取出多个参数中第一个参数的值；
+		命名参数
+			明确指定封装参数是map中的key；
+			在接口中方法的参数列表里面的每一个参数前使用注解@Param(String name)，指定参数的key名称；
+			#{指定的key}：取出指定的key对应的值；
+		POJO类型的参数
+			#{属性名}：取出传入的pojo的属性值；
+		Map类型的参数
+			如果多个参数不是业务模型中的数据，没有对应的pojo，为了方便，我们可以传入map；
+				#{key}：取出map中对应的值；
+		注：如果传入的参数中有一个参数类型是pojo类型，获取参数中的属性#{param.属性名}；
+			如果是List，Set和数组类型，在map中List的key为list，数组为array，取出#{list[index]}或者#{array[index]}；
+			#和$的区别
+				#{}以预编译的形式，将参数设置到sql语句中；
+				${}取出的值直接拼接在sql语句中，会有安全问题（当表名需要动态改变时使用$，因为表名不支持占位符）；
+			#取值时规定参数的一些规则
+				javaType：
+				jdbcType：
+				mode（存储过程）
+				numericScale
+				resultMap
+				typeHandler
+				jdbcTypeName
+				expression
+	<select/>标签
+		返回List
+			如果要返回一个List集合，就要在resultType中写上集合中元素的类型；
+		记录封装Map
+			单条记录：map的主键就是字段名，value就是字段对应的值，在resultType中写上map；
+			多条记录：map主键这条记录的主键（在方法中使用注解@MapKey指定这条记录的主键是什么），value是JavaBean，resultType中写上JavaBean的类路径；
+		resultMap自定义映射规则（和resultType二选一）
+			属性
+				type：自定义规则的Java类型；
+				id：唯一id方便引用；
+			<resultMap id="userResultMap" type="User">
+			  <id property="id" column="user_id" />
+			  <result property="username" column="user_name"/>
+			  <result property="password" column="hashed_password"/>
+			</resultMap>
+			<id/>标签标识主键；
+			<result/>标签标识普通列；
+				属性
+					column：指定哪一列；
+					property：指定对应JavaBean属性；
+			联合查询
+				级联属性封装结果集
+					<resultMap id="userResultMap" type="User">
+					  <id property="id" column="user_id" />
+					  <result property="username" column="user_name"/>
+					  <result property="password" column="hashed_password"/>
+					  <result property="外部类.属性名" column="hashed_password"/>（级联属性封装结果集）
+					</resultMap>
+				<association/>标签（单个对象，association标签里面要定义这个属性对象下的id和result）
+					属性
+						property：指定哪个属性是联合的对象；
+						javaType：指定属性对象的类型（不能省略）；
+				使用association进行分步查询
+					先写一个select查到一行数据，再按照这行数据中的某一一个值作为参数调用另一个方法；
+					属性
+						select：表明当前属性是调用select指定的方法查出的结果；
+						column：指定将哪一列的值传给这个方法；
+					延迟加载
+						先从单表查询、需要时再从关联表去关联查询，大大提高 数据库性能，因为查询单表要比关联查询多张表速度要快；
+						开启延迟加载需要在全局配置文件中的<settings/>标签中使用<setting name="lazyLoadingEnabled" value="true"/>
+																			   <setting name="aggressiveLazyLoading" value="false"/>	
+				<collection/>标签（多个对象）
+					定义集合类型的属性的封装规则；
+					属性
+						property：集合在这个类中的变量名；
+						ofType：指定集合里面元素的类型；
+					在<collection/>标签里面定义集合元素的封装规则；
+					分步查询
+						在<collection/>标签里添加select属性和column属性即可实现分段查询；
+				分步查询传递多列的值
+					将多列的值封装map传递；
+					column="{key1=column1,key2=column2}"
+						key对应的是被调用语句中的参数名，column对应的是调用语句中对应的参数；
+						fetchType属性
+							lazy：开启延迟加载；
+							eager：立即查询；
+				<discriminator/>鉴别器
+					Mybatis可以使用discriminator判断某列的值，然后根据某列的值改变封装行为；
+					属性
+						column：判定的列名；
+						javaType：列值对应的java类型；
+					当鉴别器标签里<case/>标签中的value属性等于column属性的值则执行后续的封装规则（详情见官方文档）；
