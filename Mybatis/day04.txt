@@ -1,0 +1,95 @@
+1、动态SQL
+	动态SQL是MyBatis的强大特性之一，可以方便地根据不同条件拼接SQL语句；
+	if标签
+		属性
+			test：判断表达式（OGNL表达式），从参数中取值判断，遇见特殊符号要写上转义字符；
+				  参数的方法取决于参数是什么Java类型；
+		注：某些条件没有带可能sql拼装会有问题，解决方案：在where后面加上1=1，以后的条件都是and XXX；
+														 在mybatis中把所有的查询条件都放在<where/>标签中；
+	choose (when, otherwise)标签
+		我们不想使用所有的条件，而只是想从多个条件中选择一个使用，MyBatis提供了choose元素，它有点像Java中的switch语句；
+			<select id="findActiveBlogLike"
+				 resultType="Blog">
+			  SELECT * FROM BLOG WHERE state = ‘ACTIVE’
+			  <choose>
+				<when test="title != null">
+				  AND title like #{title}
+				</when>
+				<when test="author != null and author.name != null">
+				  AND author_name like #{author.name}
+				</when>
+				<otherwise>
+				  AND featured = 1
+				</otherwise>
+			  </choose>
+			</select>
+		传入哪个参数就去找对应的参数；
+	trim (where, set)标签
+		<where/>只会在子元素返回任何内容的情况下才插入“WHERE”子句。而且，若子句的开头为 “AND” 或 “OR”，where元素也会将它们去除
+		自定义 trim 元素来定制 where 元素的功能
+		属性
+			prefix=""：前缀trim标签体中整个字符串拼串后的结果，prefix给拼串后的字符串加一个前缀；
+			prefixOverrides=""：前缀覆盖：去掉整个字符串前面多余的字符；
+			suffix=""：后缀，给拼串后的整个字符串加一个后缀；
+		<set/>用于动态更新语句的类似解决方案叫做set。set元素可以用于动态包含需要更新的列，忽略其它不更新的列，会动态地在行首插入 SET 关键字，并会删掉额外的逗号;
+			<update id="updateAuthorIfNecessary">
+			  update Author
+				<set>
+				  <if test="username != null">username=#{username},</if>
+				  <if test="password != null">password=#{password},</if>
+				  <if test="email != null">email=#{email},</if>
+				  <if test="bio != null">bio=#{bio}</if>
+				</set>
+			  where id=#{id}
+			</update>
+	foreach标签
+		属性
+			collection：指定要遍历的集合(list类型的参数会特殊处理封装在在map中，map的key就叫list)；
+			item：将当前遍历出的元素赋值给指定的变量；
+			separator：每个元素之间的分隔符；
+			open：遍历出所有结果拼接一个开始的字符；
+			close：遍历出所有结果拼接一个结束的字符；
+			index：索引，遍历list时index就是索引，item就是值当前值
+						 遍历map时index就是map的key，item就是map的value；
+		foreach循环操作
+			循环取出集合里的值
+				<select id="getEmployeeDyForeach" resultType="com.hejianfeng.bean.Employee">
+					select id, last_name lastName, gender, email from tbl_employee
+					<trim prefix="where" prefixOverrides="and|or" suffixOverrides="and|or">
+						<if test="ids.size()>0">
+							<foreach collection="ids" index="index_arg" open="and" separator="or">
+								<if test="index_arg=='eid'.toString()">
+									<foreach collection="ids.get(index_arg)" open="id in (" separator="," close=")" item="item_arg">
+										#{item_arg}
+									</foreach>
+								</if>
+							</foreach>
+						</if>
+					</trim>
+				</select>
+			循环插入(mysql支持insert into tablexxx() values(),(),(),()...)
+				<insert id="insertEmployeeDyForeach" parameterType="com.hejianfeng.bean.Employee">
+					insert into tbl_employee(id, last_name, gender, email, d_id)
+					values
+					<foreach collection="emps" item="emp" separator=",">
+						(#{emp.id}, #{emp.lastName}, #{emp.gender}, #{emp.email}, #{emp.dept.id})
+					</foreach>
+				</insert>
+		内置参数
+			_parameter：代表整个参数
+				单个参数：_parameter；
+				多个参数：参数会被封装为一个map（_parameter就代表这个map）；
+			_databaseId：如果配置了DatabaseIdProvider标签（全文配置里设置），_databaseId代表当前数据库别名；
+		bind绑定
+			可以将ONGL表达式绑定到一个变量中，方便后来引用这个变量的值；
+			属性
+				name：绑定后变量的名字；
+				value：要绑定的表达式；
+			<bind name="_lastName" value="'%'+lastName+'%'"/>
+			注：绑定一个表达式后，使用#{bind的name}即可取出对应的表达式的值；
+		抽取重用的sql片段
+			使用方式
+				首先用<sql/>标签将sql语句片段包裹，<sql id="">被抽取的sql语句片段<sql/>；
+				再在用到该片段的地方使用<include refid="sql标签的名字"> <property name="标识" value="属性的值"/><include/>引用该sql片段；
+			注：sql标签中可以使用上述的标签；
+				include标签里可以自定义一些property，sql标签里就可以使用自定义的属性${property名称}（使用$取出）
