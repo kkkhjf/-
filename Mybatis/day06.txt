@@ -1,0 +1,55 @@
+1、逆向工程
+	Mybatis逆向工程是通过配置文件生成对应的接口和映射文件；
+	配置文件说明
+	<?xml version="1.0" encoding="UTF-8"?>
+	<!DOCTYPE generatorConfiguration
+			PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+			"http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+	<generatorConfiguration>
+		<!-- targetRuntime：定义运行时方式
+			 MyBatis3Simple：生成简单的Mapper配置文件
+			 
+			 -->
+		<context id="DB2Tables" targetRuntime="MyBatis3Simple">
+			<!-- 指定如何连接到目标数据库 -->
+			<jdbcConnection driverClass="com.mysql.jdbc.Driver"
+							connectionURL="jdbc:mysql://localhost:3306/mybatis"
+							userId="root"
+							password="123456">
+			</jdbcConnection>
+			<!-- java类型解析器 -->
+			<javaTypeResolver >
+				<property name="forceBigDecimals" value="false" />
+			</javaTypeResolver>
+			<!-- 定义Java模型属性，生成JavaBean
+				 targetPackage：目标包名；
+				 targetProject：目标工程
+			-->
+			<javaModelGenerator targetPackage="com.hejianfeng.bean" targetProject=".\src">
+				<property name="enableSubPackages" value="true" />
+				<property name="trimStrings" value="true" />
+			</javaModelGenerator>
+			<!-- sql映射生成策略，生成映射配置文件 -->
+			<sqlMapGenerator targetPackage="com"  targetProject=".\conf">
+				<property name="enableSubPackages" value="true" />
+			</sqlMapGenerator>
+			<!-- 指定mapper接口的位置 -->
+			<javaClientGenerator type="XMLMAPPER" targetPackage="com.hejianfeng.dao"  targetProject=".\src">
+				<property name="enableSubPackages" value="true" />
+			</javaClientGenerator>
+			<!-- 指定逆向生成哪些表:根据表创建JavaBean
+				 domainObjectName：指定该表对应的JavaBean；
+			 -->
+			<table tableName="tbl_employee" domainObjectName="Employee"></table>
+			<table tableName="tbl_dept" domainObjectName="Department"></table>
+		</context>
+	</generatorConfiguration>
+	执行配置文件
+		List<String> warnings = new ArrayList<String>();
+       boolean overwrite = true;
+       File configFile = new File("./conf/generator.xml");
+       ConfigurationParser cp = new ConfigurationParser(warnings);
+       Configuration config = cp.parseConfiguration(configFile);
+       DefaultShellCallback callback = new DefaultShellCallback(overwrite);
+       MyBatisGenerator myBatisGenerator = new MyBatisGenerator(config, callback, warnings);
+       myBatisGenerator.generate(null);
