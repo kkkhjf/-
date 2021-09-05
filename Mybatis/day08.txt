@@ -1,0 +1,48 @@
+1、插件开发
+	四大对象每个创建的时候
+		不是直接返回而是调用interceptorChain,pluginAll(oarameterHandler)方法；
+		获取到所有的Interceptor(拦截器（插件要实现的接口）)
+			调用interceptor。plugin(target)方法，返回包装后的对象；
+		插件机制，我们可以使用插件为目标对象创建一个代理对象（插件可以为四大对象创建一个代理对象，代理对象就可以拦截到四大对象的每一个执行）；
+	插件的实现
+		实现接口Interceptor接口
+			//拦截目标对象的目标方法的执行
+			@Override
+			public Object intercept(Invocation invocation) throws Throwable {
+				//执行目标方法
+				Object proceed = invocation.proceed();
+				//返回执行后的结果
+				return proceed;
+			}
+
+			//包装目标对象，为目标对象创建一个代理对象
+			@Override
+			public Object plugin(Object target) {
+				//可以借助Plugin类的wrap方法来使用当前Interceptor包装我们的目标对象
+				Object wrap = Plugin.wrap(target, this);
+				//返回当前target创建的动态代理
+				return wrap;
+			}
+
+			//将插件注册时的property属性设置进来
+			@Override
+			public void setProperties(Properties properties) {
+				System.out.println("插件配置的信息: " + properties);
+			}
+		使用注解@Intercepts注解，完成插件签名（告诉Mybatis当前插件用来拦截哪个方法）
+			@Intercepts(
+					//type：拦截器拦截哪个对象，method：拦截对象中的哪个方法，args：方法中的参数；
+					@Signature(type = StatementHandler.class, method = "parameterize", args = java.sql.Statement.class )
+			})
+		将写好的插件注册到全局配置文件中，使用<plugin/>标签； 
+		注：每个对象在被创建的时候都会调用intercept方法，但是会判断一下是不是要被包装的对象，只有是要被包装的对象才会创建代理对象；
+			多个插件就会产生多个代理，创建代理对象的顺序按照配置文件中插件的顺序进行创建，第一个创建代理对象后返回给第二个接着创建代理对象，执行的时候会从外到内执行代理对象中的方法；
+
+2、插件的使用
+	导入插件就可以使用不同插件的功能；
+	批量操作获取sqlSession时调用openSession(Class<?> TypeExecutor)方法传入Executor.BATCH参数；
+		注：批量操作时只是不断地预编译不一样的sql语句，不会预编译一次执行一次；
+	存储过程
+		使用select标签调用存储过程；
+		select标签的的statementType属性要写成CALLABLE；
+		标签体中使用{call 存储过程名(参数列表)}调用存储过程（参数要#{参数名,mode=IN/OUT,jdbcType=jdbc类型}）；
