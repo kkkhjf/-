@@ -38,11 +38,18 @@
 		注：每个对象在被创建的时候都会调用intercept方法，但是会判断一下是不是要被包装的对象，只有是要被包装的对象才会创建代理对象；
 			多个插件就会产生多个代理，创建代理对象的顺序按照配置文件中插件的顺序进行创建，第一个创建代理对象后返回给第二个接着创建代理对象，执行的时候会从外到内执行代理对象中的方法；
 
-2、插件的使用
-	导入插件就可以使用不同插件的功能；
+2、扩展
+	插件的使用，导入插件就可以使用不同插件的功能；
 	批量操作获取sqlSession时调用openSession(Class<?> TypeExecutor)方法传入Executor.BATCH参数；
 		注：批量操作时只是不断地预编译不一样的sql语句，不会预编译一次执行一次；
 	存储过程
 		使用select标签调用存储过程；
 		select标签的的statementType属性要写成CALLABLE；
 		标签体中使用{call 存储过程名(参数列表)}调用存储过程（参数要#{参数名,mode=IN/OUT,jdbcType=jdbc类型}）；
+	自定义类型处理器处理枚举类型
+		首先要实现TypeHandler接口；
+		自定义TypeHandler接口中的方法；
+		在全局配置文件中配置TypeHandler
+			<typeHandlers>
+				<typeHandler handler="自定义处理器全类名" javaType="被处理的类的全类名">
+			<typeHandlers/>
