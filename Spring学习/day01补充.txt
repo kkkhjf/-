@@ -1,0 +1,144 @@
+1、IOC原理
+	底层原理（xml解析、工厂模式和反射）
+		xml配置文件，配置创建的对象；
+		通过工厂设计模式和反射实现解耦
+			获取xml中配置的clsss属性，得到目标类的class；
+			通过反射创建对象；
+			使用newInstance()方法返回创建的对象；
+		IOC思想基于IOC容器完成，IOC容器底层就是对象工厂；
+		Spring提供IOC容器实现两种方式（两个接口）：
+			BeanFactory
+				IOC基本实现，是Spring内部的使用接口，不提供开发人员使用；
+				加载配置文件时，不会创建里面的对象，在获取对象或使用对象时才去创建；
+			ApplicationContext
+				BeanFactory接口的子接口，提供更强大的功能，面向开发人员；
+				加载配置文件时就会创建对象；
+		Bean管理xml方式
+			注入空指和特殊符号
+				<!--设置空值-->
+				<bean id="id" class="com.hejianfeng.pojo">
+					<property name="name">
+						<null/>
+					</property>
+				</bean>
+				<!--特殊符号-
+					 转义：&lt;&gt;；
+					 CDATA结构：<![CDATA[填写内容]]>
+				->
+				<bean id="id" class="com.hejianfeng.pojo">
+					<property name="name">
+						<value>
+							<![CDATA[填写内容]]>
+						</value>
+					</property>
+				</bean>
+			注入对象
+				注入外部bean（其他类）
+					<property name="属性名" ref="其他类的id"></property>
+					例：
+						<bean id="emp" class="com.hejianfeng.pojo.Employee">
+							<property name="name" value="hjf"/>
+							<property name="gender" value="男"/>
+							<property name="dept" ref="dept"/>
+						</bean>
+
+						<bean id="dept" class="com.hejianfeng.pojo.Department">
+							<property name="deptName" value="开发部"/>
+							<property name="deptID" value="1"/>
+						</bean>
+				注入内部bean
+					<property name="属性名">
+						<!--配置bean标签-->
+						<bean></bean>
+					</property>
+					例：
+						<bean id="emp" class="com.hejianfeng.pojo.Employee">
+							<property name="name" value="hjf"/>
+							<property name="gender" value="男"/>
+							<property name="dept">
+								<bean id="dept" class="com.hejianfeng.pojo.Department">
+									<property name="deptName" value="开发部"/>
+									<property name="deptID" value="1"/>
+								</bean>
+							</property>
+						</bean>
+			注入集合对象
+				<bean id="emp" class="com.hejianfeng.pojo.Employee">
+					<!-- 注入数组 -->
+					<property name="phone">
+						<array>
+							<value>1234123</value>
+							<value>132</value>
+						</array>
+					</property>
+					<!-- 注入list -->
+					<property name="future">
+						<list>
+							<value>akjshdfsakjhf</value>
+							<value>asdjkhaksfdjh</value>
+						</list>
+					</property>
+					<!-- 注入map -->
+					<property name="map">
+						<map>
+							<entry key="hjasd" value="123"></entry>
+							<entry key="hjf" value="123"></entry>
+						</map>
+					</property>
+					<!-- 注入set -->
+					<property name="set">
+						<set>
+							<value>asd</value>
+							<value>asdas</value>
+						</set>
+					</property>
+				</bean>
+				注：当集合中的类型是对象时，再<list/>标签里使用<ref bean="bean的ID">；
+					把集合注入部分提取出来
+						首先引入命名空间util
+							xmlns:util="http://www.springframework.org/schema/util"
+							http://www.springframework.org/schema/util
+							https://www.springframework.org/schema/util/spring-util.xsd
+						使用<util/>标签将公用集合包裹起来
+							<util:list id="empList">
+								<value>asdasd</value>
+								<value>asdasd</value>
+								<value>asdasd</value>
+							</util:list>
+							
+							<util:map></util:map>
+							<util:set></util:set>
+						在<property/>标签中使用ref引用被封装的模块的id即可；
+			工厂Bean
+				工厂bean：在配置文件定义bean类型可以和返回类型不一样；
+				工厂Bean的创建方法
+					定义一个类，让其实现FactoryBean接口；
+			bean的作用域
+				单例模式(Spring默认)
+					IOC容器对一个bean只保存一个对象；
+					<bean id="accountService" class="com.something.DefaultAccountService" scope="singleton"/>
+				原型模式（每次从容器中get的时候，都会产生一个新对象）
+					<bean id="accountService" class="com.something.DefaultAccountService" scope="prototype"/>
+				其余的request、session、application这些在web开发中使用；
+			bean的生命周期
+				通过构造器创建bean实例（无参构造）；
+				为bean的属性设置值和对其他bean引用（调用set方法）；
+				调用bean的初始化方法（需要进行配置初始化方法）；
+				bean可以使用了（对象获取到了）；
+				当容器关闭时，调用bean的销毁方法（需要及逆行配置销毁的方法）；
+			自动装配
+				根据指定的装配规则（属性名称或者属性类型），Spring自动将匹配的属性值进行注入；
+				<bean/>标签里的属性autowire实现自动装配
+					autowire属性里的值
+						byName：根据属性名称注入，注入值bean的id值和类属性名称一样；
+						byType：根据属性类型注入；
+			引入外部属性文件
+				创建properties属性文件（jdbc为例）；
+				把外部properties属性引入到spring配置文件中（引入context名称空间）；
+					<context:property-placeholder location="jdbc.properties"/>
+					<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+						<property name="driverClassName" value="${prop.driverClass}"></property>
+						<property name="url" value="${prop.url}"></property>
+						<property name="username" value="${prop.userName}"></property>
+						<property name="password" value="${prop.password}"></property>
+					</bean>	

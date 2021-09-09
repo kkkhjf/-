@@ -1,0 +1,28 @@
+注解创建对象
+	常用注解
+		常用：@Component
+		dao：@Repository
+		service：@Service
+		controller：@Controller
+		注：上面这四个注解功能都是一样的，都是代表将某个类注册到Spring，装配bean（不同的层用不同的注解）；
+	注解创建对象
+		引入依赖（spring-aop）；
+		开启组件扫描
+			<context:component-scan base-package="com.hejianfeng.pojo">       
+			</context:component-scan>
+			注：要扫描多个包在base-package中用逗号分隔，或者填写上一级目录；
+			组件扫描配置
+				
+		使用注解
+			@Component(value = "emp") (类似于<bean/>标签中的id)
+				value默认是类名首字母小写；
+			@Value("hjf")
+				对属性进行赋值；
+			@AutoWired
+				根据属性类型进行自动分配；
+			@Qualifiler
+				根据属性名称进行注入，如果一个接口有多个实现类，需要在另一个类中引用该接口，则可以使用@Qualifier指定一个类注入 ；
+			@Resource
+				可以根据类型注入，可以根据名称注入；
+				加上value属性就是根据名称注入，否则就是根据类型注入；
+		
