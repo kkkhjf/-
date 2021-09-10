@@ -1,0 +1,62 @@
+1、AOP
+	底层原理
+		JDK动态代理
+			java.lang.reflect.Proxy类中的newProxyInstance创建代理类；
+			newProxuInstance的三个参数
+				第一个参数：类加载器；
+				第二个参数：增强方法所在的类，这个类实现的接口，支持多个接口；
+				第三参数：实现这个接口InvocationHandler，创建代理对象，写增强的部分；
+		AOP术语
+			连接点
+				类里面哪些方法可以被增强，这些方法称为连接点；
+			切入点
+				实际被增强的方法，称为切入点；
+			通知（增强）
+				实际增强的逻辑部分被称为通知；
+				通知有多种类型
+					前置通知
+						在切入点之前执行
+					后置通知
+						在切入点后执行
+					环绕通知
+						在切入点前后都执行
+					异常通知
+						切入点异常时才执行
+					最终通知
+						最后一步执行；
+			切面
+				把通知应用到切入点；
+		AOP操作准备
+			Spring框加一般都是基于AspectJ（独立的AOP框加，一般和Spring一起使用）实现AOP操作；
+			基于AspectJ实现AOP操作
+				基于xml配置文件实现；
+				基于注解实现；
+			切入点表达式（让Spring知道对哪个类里面的哪个方法进行增强）
+				语法结构
+					execution([权限修饰符][返回类型][类全路径][方法名称]([参数列表]))；
+		AspectJ注解方式实现AOP
+			实现步骤
+				选择被增强的类和创建增强类；
+				开启注解扫描；
+				在增强类上设置注解@Aspect，生成代理对象；
+				在spring配置文件中开启生成代理对象；
+				在增强方法中加上通知类型的注解，注解里的value属性上写上execution表达式；
+				注：环绕通知注解标识的方法要传递一个ProceedingJoinPoint类型的参数，然后在方法体中使用该参数调用proceed()方法，执行切入点；
+			相同切入点抽取
+				将相同的代码封装到一个方法中，使用@Pointcut(value=execution表达式)注解标记；
+				后续通知想要使用这一段代码时只需要在通知注解的value属性后面用该切入点方法代替execution表达式即可；
+			多个增强类对同一个方法进行增强，设置增强类的优先级
+				在增强类上加一个注解@Order(int型参数)，数字越小优先级越高；
+		配置文件实现AOP
+			在配置文件中配置对象；
+			配置aop增强
+				<!-- 配置aop增强 -->
+				<aop:config>
+					<!-- 配置切入点 -->
+					<aop:pointcut id="p" expression="execution(* com.hejianfeng.service.UserAOP.add(..))"/>
+					
+					<!-- 配置切面 -->
+					<aop:aspect ref="testAOP">
+						<aop:before method="enhance" pointcut-ref="p"/>
+					</aop:aspect>
+				</aop:config>
