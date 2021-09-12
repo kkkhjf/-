@@ -1,0 +1,101 @@
+1、事务
+	事务是数据库操作最基本单元，逻辑上一组操作，要么都成功，如果有一个失败所有操作都失败；
+	事务的四个特性（ACID）
+		原子性
+			不可分割
+		一致性
+			操作前和操作后总量不变；
+		隔离性
+			多事务操作的时候不会相互造成影响；
+		持久性
+			提交事务后数据会永久改变；
+	事务操作
+		开启事务操作；
+		进行业务操作；
+		捕获异常
+			没有异常提交事务；
+			出现异常事务回滚；
+	Spring事务管理
+		声明式事务管理
+			基于注解方式
+			基于xml配置文件方式
+		注：声明式事务管理的底层用到的是AOP原理；
+	Spring事务管理API
+		提供一个接口（PlatformTransactionManager），代表事务管理器，这个接口针对不同的框加提供不同的实现类；
+	声明式事务管理	
+		基于注解实现
+			创建事务管理器
+				<!--创建事务管理器-->
+				<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+					<!--注入dataSource对象-->
+					<property name="dataSource" ref="dataSource"/>
+				</bean>
+			开启事务注解
+				导入事务命名空间
+					xmlns:tx="http://www.springframework.org/schema/tx"
+					https://www.springframework.org/schema/context/spring-context.xsd
+					http://www.springframework.org/schema/tx
+				开启事务注解
+					<tx:annotation-driven transaction-manager="transactionManager"></tx:annotation-driven>
+			用注解实现事务管理
+				@Transaction，这个注解添可以添加到类上也可以添加到方法上面
+					添加到类上表示该类里面所有的方法都添加事务；
+					添加到方法上表示只为这个方法添加事务；
+				注：加到service方法上；
+		事务参数
+			propagation（事务传播行为）
+				多事务方法直接进行调用，这个过程中事务是如何进行管理的；
+				事务方法：对数据库表数据进行变化的操作；
+				Spring框架7种事务传播行为
+					REQURED：如果有事务在运行，当前的方法就在这个事务内运行，否则，就启动一个新的事务，并在自己的事务内运行；
+					REQURED_NEW：当前的方法必须启动新事务，并在它自己的事务内运行，如果有事务正在运行，应该将它挂起；
+					SUPPORTS：如果有事务在运行，当前的方法就在这个事务内运行，否则它可以不运行在事务中；
+					NOT_SUPPORTE：当前的方法不应该运行在事务中，如果有运行的事务，将它挂起；
+					MANDATORY：当前的方法必须运行在事物内部，如果没有正在运行的事务，就抛出异常；
+					NESTED：如果有事务在运行，当前的方法就应该在这个事务的嵌套事务内运行，否则，就启动一个新的事务，并在它自己的事务内运行；
+				注：参数使用@Transactional(propagation = Propagation.REQUIRED)，默认是REQUIRED；
+			ioslation（事务隔离级别）
+				事务有特性称为隔离性，多事务之间不会产生影响，不考虑隔离性产生很多问题；
+				有三个读问题：脏读、不可重复读、幻读
+					脏读：一个未提交的事务读取到另一个未提交的事务；
+					不可重复读：一个未提交的数据读取到了另一个提交的事务修改后的值；
+					幻读：一个未提交事务，读取到另一个提交事务新添加的数据；
+				设置事务隔离级别
+										脏读	不可重复读	幻读
+					READ UNCOMMITTED	有		有			有
+					READ COMMITTED		无		有			有
+					REPEATABLE READ		无		无			有
+					SERIALIZABLE		无		无			无
+				注：隔离级别参数设置@Transactional(isolation = Isolation.READ_COMMITTED)，多个参数中间用逗号隔开
+			timeout（赶超时间）
+				事务需要在一定的时间内进行提交，如果不提交进行回滚；
+				默认是-1，设置时间以秒为单位进行计算；
+			readOnly（是否只读）
+				是否只读，默认值是False（即可查询也可修改数据）；
+				设置为True，则只能查询不能修改数据；
+			rollbackFor（回滚）
+				设置出现哪些异常进行事务回滚；
+			noRollbackFor
+				设置出现哪些异常不进行事务回滚；
+		基于xml配置文件实现
+			配置事务管理器
+				<!--创建事务管理器-->
+				<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+					<!--注入dataSource对象-->
+					<property name="dataSource" ref="dataSource"/>
+				</bean>
+			配置通知
+				<tx:advice id="txadvice">
+					<!--配置事务参数-->
+					<tx:attributes>
+						<!--指定哪种规则(按照方法名称筛选,account*表示account开头的方法)的方法上面添加事务-->
+						<tx:method name="accountMoney" isolation="READ_COMMITTED" propagation="REQUIRED"/>
+					</tx:attributes>
+				</tx:advice>
+			配置切入点和切面
+				<aop:config>
+					<!--配置切入点-->
+					<aop:pointcut id="p" expression="execution(* com.hejianfeng.service.UserService.*(..))"/>
+					<!--配置切面-->
+					<aop:advisor advice-ref="txadvice" pointcut-ref="p"/>
+				</aop:config>

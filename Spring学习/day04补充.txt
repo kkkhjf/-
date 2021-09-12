@@ -1,0 +1,45 @@
+1、JDBCTemplate
+	准备工作
+		导入依赖（jdbc、tx、orm）；
+		在spring配置文件中配置数据库连接池
+			<!--引入引入外部文件-->
+			<context:property-placeholder location="jdbc.properties"/>
+			<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="clone">
+				<property name="driverClassName" value="${prop.driverClass}"/>
+				<property name="url" value="${prop.url}"/>
+				<property name="username" value="${prop.userName}"/>
+				<property name="password" value="${prop.password}"/>
+			</bean>
+		配置jdbctemplate对象，注入DataSource；
+			<!--配置jdbc对象-->
+			<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+				<!--注入dataSource对象-->
+				<property name="dataSource" ref="dataSource"></property>
+			</bean>
+		创建service类、dao类，在dao注入jdbcTemplate对象；
+	执行插入和删除
+		在service类中调用dao类中的方法；
+		在dao类中的方法里，使用jdbcTemplate对象的update(String sql, Object... args)方法进行传参；
+	查询返回某个值
+		在service类中调用dao类中的方法；
+		在dao类中的方法里，使用jdbcTemplate对象的queryForObject(String sql, Class<T> returnType)方法进行传参；
+	查询返回对象
+		在service类中调用dao类中的方法；
+		在dao类中的方法里，使用jdbcTemplate对象的queryForObject(String sql, RowMapper<T> rowMapper, Object... args)方法进行传参；
+			queryForObject()方法中的第二个参数：RowMapper是接口，针对返回不同类型数据，使用这个接口里面实现类完成数据封装；
+			具体实现
+				Employee employee = jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<Employee>(Employee.class), id);
+	查询返回集合
+		在service类中调用dao类中的方法；
+		在dao类中的方法里，使用jdbcTemplate对象的query(String sql, RowMapper<T> rowMapper, Object... args)方法进行传参；
+			具体实现
+				jdbcTemplate.query(sql, new BeanPropertyRowMapper<Employee>(Employee.class));
+	批量添加
+		在service类中调用dao类中的方法；
+		在dao类中的方法里，使用jdbcTemplate对象的batchUpdate(String sql, List<Object> batchArgs)
+			第一个参数是sql语句；
+			第二个参数是List集合，添加多条记录数据；
+	批量修改和删除
+		同批量添加一样，将batchUpdate方法中的sql语句换成update和delete即可；
+
+		
