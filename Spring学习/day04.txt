@@ -1,0 +1,36 @@
+1、整合MyBatis
+	需要的依赖
+		spring四件套；
+		aspectj依赖；
+		mybatis依赖；
+		mybatis-spring依赖；
+	配置Mybatis
+	Mybatis-Spring
+		帮助你将MyBatis代码无缝地整合到Spring中。它将允许MyBatis参与到Spring的事务管理之中，创建映射器mapper和SqlSession并注入到bean中，以及将Mybatis的异常转换为Spring的DataAccessException。最终，可以做到应用代码不依赖于MyBatis，Spring或MyBatis-Spring；
+		整合Mybatis和Spring
+			创建Spring配置文档；
+			在Spring文档中配置DataSource和sqlSessionFactory
+			<!--配置DataSource-->
+			<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+				<property name="driverClassName" value="${prop.driverClass}"/>
+				<property name="url" value="${prop.url}"/>
+				<property name="username" value="${prop.userName}"/>
+				<property name="password" value="${prop.password}"/>
+			</bean>
+			<!--配置sqlSessionFactory-->
+			<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+				<property name="dataSource" ref="dataSource"/>
+				<property name="configLocation" value="mybatis.xml"/>
+				<property name="mapperLocations" value="mapper.xml"/>
+			</bean>
+			<!--配置SqlSession-->
+			<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+				<!--只能使用构造器注入，因为没有setter方法-->
+				<constructor-arg index="0" ref="sqlSessionFactory"/>
+			</bean>
+			<!--配置接口实现类-->
+			<bean id="employeeDaoImpl" class="com.hejianfeng.dao.EmployeeDaoImpl">
+				<property name="sqlSession" ref="sqlSessionTemplate"/>
+			</bean>
+			注：在Spring配置文件里设置映射文件时，在Mybatis配置文件里就不用重复添加映射文件了；
+				
