@@ -33,4 +33,4 @@
 				<property name="sqlSession" ref="sqlSessionTemplate"/>
 			</bean>
 			注：在Spring配置文件里设置映射文件时，在Mybatis配置文件里就不用重复添加映射文件了；
-				
+			    在Spring配置文件中将dao实现类注入，通过Bean容器管理bean；	
