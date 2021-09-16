@@ -1,0 +1,56 @@
+1、域对象共享数据
+	使用ServletAPI向request域对象共享数据
+		HttpServletRequest.setAttribute("键","值");
+		页面上获取共享域对象里的数据
+			thymeleaf只能解析th:属性名的值，所以只能在标签里面的text属性里写上${}；
+			如果访问请求域中的数据，则直接写键名；
+			Session域中的数据则直接写Session.键名；
+			过去ServletletContext域中的数据，则是Application.键名；
+	使用ModelAndView向request域共享数据
+		ModelAndView有Model和View的功能
+			Model主要用于请求域共享数据；
+			View主要用于设计视图，实现页面跳转；
+		使用该方式向向Request域存储数据，方法返回类型必须为ModelAndView（返回给前端解析器，让前端解析器解析）
+		插入数据的步骤
+			创建ModelAndView对象；
+			处理模型数据，即向请求域request共享数据；
+			设置视图名称（普通控制器方法返回的字符串）；
+	通过Model向request域对象共享数据
+		在形参中使用Model对象，调用Model.addAttribute("key","value")向request域中存储数据；
+		具体使用同ServletAPI一样；
+	通过map向request域对象共享数据
+		在形参中创建Map类型的参数，向map中存储一个键值对就是在向request域中存储对象；
+		具体使用同ServletAPI一样；
+	痛过ModelMap向request域对象共享数据
+		在形参中创建ModelMap类型的形参，调用ModelMap.addAttribute("key","value")方法向request域对象中存储数据；
+		具体使用同ServletAPI一样；
+	Model、Map和ModelMap之间的关系
+		Model是一个接口；
+		ModelMap继承了LinkedHashMap，间接实现了Map接口；
+		ExtendedModelMap类实现了ModelMap类同时也实现了Model接口，其子类为上述三种类型的实现类；
+2、Session域共享数据
+	使用ServletAPI的HttpSession对象的setAttribute("key", "value")方法向Session域中共享数据；
+	使用同request一样；
+3、向application域共享数据
+	通过Session获取ServletContext对象；
+	ServletContext对象调用setAttribute方法，向application域共享数据；
+	使用同request相同；
+
+4、SpringMVC的视图
+	SpringMVC中的视图是View接口，视图的作用渲染数据，将模型Model中的数据展示给用户；
+	若使用Thymeleaf视图技术，在SpringMVC的配置文件中配置了Thymeleaf的视图解析器，由此视图解析器解析后所得到的ThymeleafView；
+	ThymeleafView
+		如果视图名称没有任何前缀那么该视图就是被ThymeleafViewResolver视图解析器解析封装成ThymeleafView对象，视图名拼接试图前缀和后缀所得到的最终路径，会通过转发的方式实现跳转；
+	InternalResourceView
+		视图名称以forword:开始，创建视图InternalResuorceView，此时视图名称不会被SpringMVC配置文件中所配置的视图解析器解析，而是将前缀"forword:"去掉，剩余部分作为最终路径通过转发的方式实现跳转；
+	RedirectView
+		当视图名称以"redirect:"为前缀的时，会创建RedirectView视图，此时的视图名称不会被SpringMVC配置文件中配置的视图解析器解析，而是将前缀"redirect:"去掉，剩余部分作为最终路径通过重定向的方式实现跳转；
+		注：重定向算连词请求，所以就不能使用第一次请求中的request域对象中的数据；
+			重定向不能访问WEB-INF下的页面；
+			重定向可以访问服务器以外的资源；
+	视图控制器
+		当前的请求映射所对应的控制方法中没有其他请求过程的处理，只需要设置一个视图名称时候，可以使用视图控制器；
+		SpringMVC配置文件中配置
+			<mvc:view-controller path="/" view-name="index"></mvc:view-controller>
+			如果不加上<mvc:annotation-driven/>标签（开启注解驱动），则所有的注解都会失效；
+		
