@@ -1,0 +1,31 @@
+1、SpringMVC获取请求参数
+	通过servletAPI获取
+		将HttpServletRequest类型的参数表示封装了当前请求的请求报文对象，使用getParameter(String paramname)方法获取参数；
+		注：使用占位符传输参数的话就不能使用request对象获取参数了；
+	通过控制器方法的形参获取请求参数
+		控制器方法中形参的参数名和请求中的参数名一致就可以得到值；
+	注：接收多个同名的参数，使用HttpServletRequest对象的getParameterValues(String name)方法可以获取String[]；
+							使用控制器方法的形参获取请求参数，直接在形参中输入String[]的形参；
+		使用第二种方式，请求参数要和形参的名字一样；
+	请求和控制器方法参数建立映射关系
+		@RequestParam请求参数和控制器形参之间的映射关系
+			使用@RequestParam注解（@RequestParam("请求参数名") 形参）可以实现请求参数和控制器形参的映射关系；
+			@RequestParam注解设置的映射关系，请求参数必须要有，否则就会报错，将required设置为false就不会报错；
+			defaultValue属性，当required属性为false时，如果没有传入这个参数就会使用默认值；
+		@RequestHeader
+			将请求头信息和控制器方法的形参创建映射关系；
+			一共有3个属性：value、required、defaultValue，用法同@RequestParam；
+		@CookieValue
+			将cookie数据和控制器方法的形参创建映射关系；
+			一共有3个属性：value、required、defaultValue，用法同@RequestParam；
+	通过POJO获取请求参数
+		可以在控制器方法形参位置设置一个实体类型的形参，此时若浏览器传输的请求参数的参数名和实体类中的属性名一致，那么请求参数就会为此属性赋值；
+		获取请求参数是出现乱码问题
+			get请求乱码问题可以通过配置Tomcat服务器的server.xml文档解决；
+			post请求解决乱码问题
+				Request请求接收参数
+					request.setCharacterEncoding("UTF-8");
+				Bean接收参数
+				需要在Servlet获取请求参数之前设置编码规则，所以需要在过滤器中设置编码规则；
+				在web.xml中配置过滤器；
+		
