@@ -1,0 +1,64 @@
+1、RESTFul
+	REST: Representatiomal State Transfer，表现层(控制层和显示层)资源状态转移；
+	资源的表述
+		对于资源在某一个特定时刻的状态的描述，可以在客户端-服务器端之间转移(交换)；
+	状态转移
+		在客户端和服务器端之间转移代表资源状态的表述，通过转移和操作资源的表述来间接实现操作资源的目的；
+	RESTFul的实现
+		HTTP协议里有四个表示操作方式的动词
+			GET：查询
+			POST：添加；
+			PUT：修改；
+			DELETE：删除；
+		REST风格提倡使用统一的风格设计，从前到后各个单词收用斜杠分开，不使用问好键值对让方式携带请求参数；、
+			传统方式		REST风格
+		  getUserById?id=1 user/1-->get请求方式
+		GET和POST请求
+			同以前一样；
+		HiddenHttpMethodFilter处理PUT和DELETE请求
+			首先配置HiddenHttpMethodFilter过滤器
+				<filter>
+					<filter-name>HiddenHttpMethodFilter</filter-name>
+					<filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
+				</filter>
+				<filter-mapping>
+					<filter-name>HiddenHttpMethodFilter</filter-name>
+					<url-pattern>/*</url-pattern>
+				</filter-mapping>
+				注：HiddenHttpMethodFilter过滤器处理POST请求，若POST请求附带一个参数将该参数转换成大写，并包装在一个新的request请求中返回；
+					HiddenHttpMethodFilter过滤器要在CharacterEncodingFilter过滤器后使用，因为HiddenHttpMethodFilter过滤器会获取请求参数导致CharacyerEncodingFilter失效；
+		注：实现PUT和DELETE请求需要传递一个_method参数，其值就是PUT或者DELETE；
+	RESTFul案例（在页面上实现对一个表的增删查改）
+		数据以表格形式显示在页面上
+			返回一个集合，在页面显示出来，使用Themyleaf中的th:each属性遍历返回的集合；
+				注：使用a标签时th:href属性不能为空，否则会解析失败，在第一行会停止循环；
+		删除功能处理超链接传参
+			路径和参数的拼接用"+"连接
+				@{/employee/}+${employee.id}；
+				@{'/employee/'+${employee.id}}；
+			通过表单实现DELETE请求
+				在<a/>标签中添加点击事件@click="deleteEmployee"；
+				创建表单将其设置为post请求，设置_method参数并赋值<input type="hidden" name="_method" value="delete">；
+				引入vue.js，并给<a/>标签点击事件绑定函数
+					<script type="text/javascript" th:src="@{/static/js/vue.js}"></script>
+					<script type="text/javascript">
+						var vue = new Vue({
+							el:"#dataTable",
+							methods:{
+								//给点击事件绑定函数
+								deleteEmployee:function (event){
+									//获取表单对象
+									var deleteForm = document.getElementById("deleteForm");
+									//给表单action属性赋值
+									deleteForm.action = event.target.href;
+									//提交表单
+									deleteForm.submit();
+									//取消超链接默认行为
+									event.preventDefault();
+								}
+							}
+						});
+					</script>
+				注：DispatcherServlet前端控制器不能处理静态资源Vue.js，需要开放MVC对静态资源的访问<mvc:default-servlet-handler/>（defaultservlet处理静态资源）；
+					后引入的资源要重新打包，否则不在服务器上无法访问；
+			
