@@ -1,0 +1,122 @@
+1、拦截器
+	SpringMVC中的拦截器用于拦截控制器方法的执行（控制器方法执行前，执行后和渲染视图完毕后）；
+	SpringMVC中的拦截器需要实现HandlerInterceptorAdapter类；
+	SpringMVC的拦截器必须在SpringMVC的配置文件中进行配置；
+	拦截器使用
+		创建拦截器（实现HandlerInterceptor接口）；
+		在SpringMVC中配置拦截器
+			配置方式一
+				<mvc:interceptors>
+					<bean class="com.hejianfeng.interceptors.FirstInterceptor"></bean>
+				</mvc:interceptors>
+				注：上面这种配置方式会拦截所有请求；
+					ref标签和bean标签一样都是对所有请求进行拦截；
+			配置方式二
+				<mvc:interceptors>
+					<mvc:interceptor>
+						<mvc:mapping path="/**"/>
+						<mvc:exclude-mapping path="/"/>
+						<ref bean="firstInterceptor"></ref>
+					</mvc:interceptor>
+				</mvc:interceptors>
+				注：/*只能代表一层目录，/**代表多层目录；
+		注：当preHandle()方法返回的是false时，表示拦截，返回为true时，表示放行；
+	拦截器的三个抽象方法
+		preHandle：控制器方法执行之前执行preHandler，返回值为true表示放行，即调用控制器方法，反之；
+		postHandle：控制器方法执行之后执行postHandler；
+		afterComplation：处理完视图和模型数据，渲染视图完毕后执行afterComplation；
+	拦截器各个方法的执行顺序
+		preHandle按照配置文件中的配置顺序执行；
+		postHandle和afterCompletion按照配置顺序的反序执行；
+		注：拦截器执行顺序
+				在执行preHandle拦截器的时候，DispatchServlet中有一个成员变量为interceptorIndex，在执行完preHandle方法后将该值改为interceptorList链中最大索引值；
+				在执行postHandle和afterComplation拦截器后，由interceptorIndex从高到0遍历拦截器链里的拦截类；
+			当某个拦截器的preHandle方法中返回的是false，会跳过postHandle方法，执行afterHandle方法，返回false和它之前的拦截器的preHandle()方法都会执行，返回false拦截器之前的拦截器的afterComplation()放啊会执行；
+2、异常处理器
+	SpringMVC提供了一个处理控制器方法执行过程中所出现的异常的接口：HandlerExceptionResolver；
+	HandlerExceptionResolver接口实现类有：DefaultHandlerExceptionResolver（SpringMVC默认异常处理器）和SimpleMappingExceptionResolver；
+	Spring提供了自定义的异常处理器SimpleMappingExceptionResolver
+		基于配置的异常处理器
+			<!--配置异常处理器-->
+			<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+				<property name="exceptionMappings">
+					<props>
+						<!--exceptionMappings中的异常是以键值对的形式存在-->
+						<!--key表示异常，双标签中的值表示value，如果没有添加任何前缀(forword:和redirect:)则由Thymeleaf解析-->
+						<prop key="java.lang.ArithmeticException">error</prop>
+					</props>
+				</property>
+				<!--页面产生异常的时候默认将异常信息存储在请求域中，以value中设置的值为键，以请求域中的值为值-->
+				<property name="exceptionAttribute" value="ex"></property>
+			</bean>
+		基于注解的异常处理器
+			//@Component注解的扩展注解
+			@ControllerAdvice
+			public class ExceptionController {
+				//添加该方法处理的异常类型
+				@ExceptionHandler(value = {ArithmeticException.class, FileNotFoundException.class})
+				//Exception对象就包含当前的异常信息，使用Model类向请求域中添加异常信息；
+				public String testException(Exception exception, Model model){
+					model.addAttribute("ex", exception);
+					return "error";
+				}
+			}
+3、SpringMVC的执行流程
+	常用组件
+		DispatcherServlet
+			前端控制器，不需要工程时开发，由框架提供；
+			统一处理请求和响应，整个流程控制的中心，由它调用其他组件处理用户的请求；
+		HandlerMapping（找控制器方法）
+			处理器映射器，不需要工程时开发，由框架提供；
+			根据请求的url、method等信息查找Handler，即控制器方法；
+		Handler
+			处理器，需要工程师开发；
+			在DispatcherServlet的控制下Handler对具体的用户请求进行处理；
+		HandlerAdapter（调用控制器方法）
+			处理适配器，不需要工程时开发，由框架提供；
+			通过HandlerAdapter对处理器(控制器方法)进行执行；
+		ViewResolver
+			视图解析器，不需要工程时开发，由框架提供；
+			进行视图解析，得到相应的视图如，ThymeleafView、InternalResourceView、RedirectView；
+		View
+			视图，不需要工程时开发，由框架提供；
+			将模型数据通过页面展示给用户；
+	DispatcherServlet初始化过程
+		遵循Servlet的生命周期；
+		初始化过程
+			GenericServlet实现了Servlet接口，并重写了init(Servlet config)方法和重载了init()方法；
+			HttpServlet继承了GenericServlet类，但是并没有重写init方法；
+			HttpServletBean继承了HttpServlet，并且重写了init()方法，创建了initServletBean()方法；
+			FrameworkServlet继承了HttpServletBean，并且重写了initServletBean()方法，并且调用了initWebApplicationContext()方法；
+			DispatcherServlet继承FrameworkServlet，并且重写了onRefresh()方法，调用了initStrategies(ApplicationContext context)方法，该方法初始化了MultipartResolver、ThemeResolver、HandlerMapping、HandlerAdapters、ViewResolver等一系列解析器；
+	DispatcherServlet服务过程
+		处理过程
+			GS继承了Servlet，没有对service(ServletRequest req, ServletResponse res)方法；
+			HS重写了GS，并重写了service(ServletRequest req, ServletResponse res)方法，调用了service(HttpServletRequest req, HttpServletResponse res)方法；
+			HSB继承HS没有重写serviceservice(HttpServletRequest req, HttpServletResponse res)方法；
+			FS继承了HSB，重写了service(HttpServletRequest req, HttpServletResponse res)方法，调用了processRequest(HttpServletRequest request, HttpServletResponse response)方法，紧接着调用了doService(HttpServletRequest request, HttpServletResponse response)抽象方法；
+			DispatcherServlet实现了doService(HttpServletRequest request, HttpServletResponse response)方法，调用doDispatch(HttpServletRequest request, HttpServletResponse response)方法，最终在该方法中实现对请求的处理；
+	DispatcherServlet调用组件处理请求
+		在执行doDispatch方法时要先创建一个执行链（包含了当前的处理器、拦截器链和拦截器索引）；
+	SpringMVC的执行流程
+		用户向服务器发送请求，请求被SpringMVC前端控制器DispatcherServlet捕获；
+		DispatcherServlet对请求URL进行解析，得到请求资源标识符URI，判断请求对URI对应的映射
+			不存在
+				判断是否配置了mvc:default-servlet-handler
+					没配置，则控制台报映射查找不到，客户端显示404错误；
+					如果有配置，则访问目标资源（一般为静态资源），找不到客户端也会展示404错误；
+			存在
+				根据该URI，调用HandlerMapping获得该Handler配置的所有相关对象（包括Handler对象以及Handler对象对应的拦截器），最后以HandlerExecutionChain执行链对象的形式返回；
+				DispatcherServlet根据获得的Handler，选择合适的HandlerAdapter；
+				如果成功获得HandlerAdapter，此时将开始执行拦截器的preHandler(...)方法；
+				提取Request中的模型数据，填充Handler的形参，开始执行Handler(Controller)方法，处理请求，在填充Handler的形参过程中，根据你的配置，Spring会做一些额外工作
+					HttpMessageConvert：将请求消息（Json、xml等数据）转换成一个对象，将对象转换成一个指定的响应信息；
+					数据转换：对请求消息及逆行数据转换，如String转换成Integer、Double等；
+					数据格式转换：对请求消息进行数据格式化，将字符串转换成格式化数字或格式化日期等；
+					数据验证：验证数据的有效性（长度、格式等），验证结果存储到BindingResult或Error中（由前端的完成，一般使用这个功能）；
+				Handler执行完后，向DispatcherServlet返回一个ModelAndView对象；
+				此时将开始执行拦截器的postHandler(...)方法；
+				根据返回的ModelAndView（此时会判断是否存在异常：如果存在异常，则执行HandlerExceptionResolver进行异常处理）选择一个合适的ViewResolver（不加前缀和加前缀）进行视图解析，根据Model和View，来渲染视图；
+				渲染视图完毕执行拦截器afterComplation(...)方法；
+				将渲染结果返回给客户端；
+			
