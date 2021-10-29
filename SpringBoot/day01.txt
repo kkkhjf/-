@@ -1,0 +1,55 @@
+1、Spring Boot程序
+	通过Maven创建SpringBoot程序，需要在pom文件中加入父依赖
+		<parent>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-parent</artifactId>
+			<version>2.3.4.RELEASE</version>
+		</parent>
+		如果需要做web应用程序则需要导入web依赖
+			<dependencies>
+				<dependency>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-web</artifactId>
+				</dependency>
+			</dependencies>
+	在一个类上添加@SpringBootApplication注解，即可该类变为SpringBoot的应用，作为SpringBoot程序的入口，程序运行时执行的是该类的main方法，在main方法中执行SpringApplication.run(MainApplication.class, args)即可启动SpringBoot程序；
+	当配置好后即可按照Spring的方式进行web开发，其中有些注解被整合在一起；
+	简化配置
+		在项目的资源目录下创建properties后缀的配置文件即可（如修改服务器端口号则写上：server.port=要修改的端口号，具体的配置可以参考官方文档）；
+	SpringBoot部署
+		使用Spring-boot自带的插件，可以实现简单部署，不需要在目标服务器上手动安装Tomcat；
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-maven-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</build>
+		该插件将程序打包成可执行JAR，打包完后可以直接运行，这是因为SpringBoot自带Tomcat；
+	注：如果需要依赖自定义的版本号。需要重写父模块中的版本号即可，具体的版本号名称定义遵循父模块里的定义；
+2、Spring Boot自动配置
+	省去了各种转发器、字符集过滤器、视图解析器等等配置；
+	省去了包扫描配置，默认扫描主程序所在包及其下面的所有子包里面的组件，自定义扫描路径@SpringBootApplication(scanBasePackages={})；
+	按需加载所有自动配置项，SpringBoot所有的自动配置功能都在spring-boot-autoconfigure包里；
+3、Spring底层注解
+	@Configuration注解
+		告诉SpringBoot该类是一个配置类（类似于配置文件）；
+		配置类中给方法加上@Bean注解，向容器中添加组件，方法名为组件id，返回类型就是组件类型，返回的值就是组件在容器中的实例；
+		容器中添加的组件，默认是单例，外部无论对配置类中的组件的注册方法调用多少次，都是之前注册在容器中的单例对象；
+		注：@Configuration注解中的proxyBeanMethods属性默认是true，true则代表从容器中直接调用组件，false则表示每次都重新创建一个新的组件返回；
+			proxyBeanMethods为true，SpringBoot每次在获取组件时都要去检查一下容器里是否有该组件；
+			proxyBeanMethods为false，SpringBoot则不会去检查容器；
+	@Import注解
+		标注在组件类或者配置类上；
+		给容器中自动创建出注解中填写的组件类型，默认组件的名字就是全类名；
+	@Conditional注解
+		满足Conditional指定的条件，则进行组件注入，@Conditional注解有很多派生的注解；
+			例如：@ConditionalOnBean(name = "tom")表示当容器中有名字为tom的组件才加载该注解修饰的组件；
+	@ImportResource
+		指定资源路径，即可将该配置文件中的组件加载到该注解修饰的配置类中；
+	@ConfigurationProperties注解
+		配置绑定，将配置文件中的属性与类中的属性绑定；
+			例如：@ConfigurationProperties(prefix = "mycar")，将配置文件中mycar开头的属性与该注解修饰的类中的属性互相绑定；
+		注：只有在容器中的组件，才会拥有SpringBoot提供的强大功能，所以需要将该类加载到容器中才能使用自动绑定的功能；
+	
