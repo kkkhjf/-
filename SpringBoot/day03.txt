@@ -1,0 +1,31 @@
+1、响应处理
+	响应JSON
+		首先获取返回值处理器；
+		返回值处理器判断是否支持这种类型返回值supportsReturnType；
+		返回值处理器调用handleReturnValue进行处理；
+		Json类型的数据依靠RequestResponseBodyMethodProcessor进行处理
+			使用MessageConverters消息转换器，将数据转换成json类型；
+				内容协商（浏览器默认会以请求头的方式告诉服务器它可以接受什么样的内容类型）；
+				服务器最终根据自己自身的能力，决定服务器能生产出什么样的数据；
+				SpringMVC会挨个遍历所有容器底层的HttpMessageConverter，看谁能处理；
+					最终MappingJackson2HttpMessageConverter把对象转为JSON（利用底层的jackson的objectMapper转换）；
+					利用MappingJackson2HttpMessageConverter将对象转为json写出去；
+	内容协商原理
+		判断当前响应头中是否有确定的响应类型；MediaType
+		获取浏览器支持接受的内容类型，获取请求中的Accept字段；
+		遍历循环所有当前系统的MessageConverter，看谁支持操作这个对象（返回的那个对象）；
+		找到支持操作这个对象的converter，把converter支持的媒体类型统计出来（会有多个，也会有重复的）；
+		进行内容协商的最佳匹配媒体类型；
+		用支持将对象转为最佳匹配媒体类型的convert，调用它进行转换；
+	开启浏览器参数方式内容协商功能
+		开启基于请求参数的内容协商功能需要在配置文件里配置一个参数，开启后将依据请求参数format中的值获取返回值处理器（默认只有xml和json）
+			spring.contentnegotiation.favor-parameter:true;
+		该功能将基于请求参数的内容协商策略添加到内容协商管理器里；
+		开启功能后，内容协商管理器将从基于请求参数的内容协商策略开始获取响应类型；
+	自定义MessageConverter
+		添加自定义的MessageConverter进底层系统（在Bean对象WebMvcConfigurer中重写extendMessageConverters（扩展MessageConverter）即可）；
+		自定义Converter类，实现HttpMessageConverter<T>接口，重写里面的方法；
+		系统底层就会统计出所有MessageConverter能操作那些类型；
+		注：WebMvcConfigurer类里可以自定义SpringBoot里的很多东西；
+			自定义内容协商管理器，不仅要手动的添加基于参数的内容协商策略，还要手动添加基于请求头的内容协商策略；
+		
