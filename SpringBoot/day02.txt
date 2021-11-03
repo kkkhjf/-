@@ -1,0 +1,140 @@
+1、Spring核心功能
+	配置文件
+		xml或者ymal
+		ymal基本语法
+			key: value，key和value之间有空格；
+			大小写敏感；
+			使用缩进表示层级关系；
+			缩进不允许使用tab只能用空格（IDEA里可以用tab）；
+			缩进的空格数不重要，只要相同层级的元素左对齐即可；
+			“#”表示注释；
+			字符串无需加引号，''与""表示字符串内容会被转义/不转义；
+		数据类型
+			单个变量：k: v；
+			对象：
+				行内写法：k: {k1: v1, k2: v2, k3: v3}；
+				竖直写法：
+					k:
+						k1: v1
+						k2: v2
+						k3: v3
+			数组
+				行内写法：[v1, v2, v3]
+				竖直写法(-后面有空格)：
+					k:
+						- v1
+						- v2
+						- v3
+		自定义类绑定的配置提示
+			引入依赖spring-boot-configuration-processor；
+			注：在maven的打包插件里把spring-boot-configuration-processor排除在外，避免打包过多的类；
+	web开发
+		静态资源
+			静态资源访问
+				静态资源目录：/static、/public、/resources和/META-INF/resources；
+				访问静态资源
+					当前项目根路径/+静态资源名；
+				注：请求进来，先去找Controller看能不能处理，不能处理的所有请求又都交给静态资源处理器，如果找不到则404；
+					一般静态资源访问加上前缀（默认无前缀）
+						在配置文件中配置spring.mvc.static-path-oattern=前缀名；
+						访问路径：/前缀/静态资源名；
+			欢迎页和网站图标
+				欢迎页是在静态资源路径下的index.html文件；
+				网站图标在静态资源路径下的favicon.ico文件；
+			静态资源配置原理
+				SpringBoot启动默认加载xxxAutoConfiguration类(自动配置类)
+				SpringMVC功能的自动配置类WebMvcAutoConfiguration生效；
+				该配置类里配置了一个组件，addResourceHandlers(ResourceHandlerRegistry registry)；
+				静态资源的访问路径在添加资源处理器中添加默认路径即上述四个静态资源目录；
+		请求参数处理
+			请求映射@xxxMapping
+				（REST风格）核心Filter：HiddenHttpMethodFilter；
+				用法：表单methodpost，隐藏域_method=put或者delete（因为在底层只有post请求才会对_mrthod属性进行处理）；
+				SpringBoot使用上述用法必须在手动开启spring.mvc.hiddenmethod.filter=true；
+			表单提交REST原理
+				表单提交会带上_method=PUT；
+				请求过来被HiddenHttpMethodFilter拦截；
+				在将请求参数转换为PUT时，会先判断请求是不是POST；
+				获取_method的值，判断_method中的值是不是在请求的转换范围内（PUT、DELETE和PATCH）；
+				最终使用包装模式使用requestWrapper包装原生的request请求，因为重写了getMethod方法，返回的是传入的值，即_method里面的值；
+				过滤器链放行的时候用wrapper。以后的方法调用getMethod是调用requestWrapper里的方法；
+			请求映射原理
+				SpringMVC功能分析都从org.springframework.web.servlet.DispatchServlet里的doDispatch方法开始；
+				doDispatch方法
+					//找到当前请求使用哪个Handler（Controller的方法）处理
+					mappedHandler = this.getHandler(processedRequest);
+					具体的操作
+						/**handlerMappings里面保存了5个Mapping值（RequestMappingHandlerMapping、WelcomePageHandlerMapping、BeanNameUrlHandlerMapping、RouteFunctionMapping、SimpleUrlHandlerMapping），
+						*这5个HandlerMapping里保存着不同的请求映射，循环找出最合适的请求处理，
+						*RequestMappingHandlerMapping里的mappingRegistry属性保存了项目里所有自定义的请求映射
+						**/
+						if (this.handlerMappings != null) {
+							Iterator var2 = this.handlerMappings.iterator();
+
+							while(var2.hasNext()) {
+								HandlerMapping mapping = (HandlerMapping)var2.next();
+								HandlerExecutionChain handler = mapping.getHandler(request);
+								if (handler != null) {
+									return handler;
+								}
+							}
+						}
+			常用参数注解
+				常用注解
+					@PathVariable		路径变量
+					@RequestHeader		获取请求头
+					@RequestParam		获取请求参数
+					@CookieValue		获取cookie的值
+					@RequestBody		获取请求体
+					@RequestAttribute	获取请求域里的值
+					@MatrixVariable		矩阵变量
+						矩阵变量用来区分普通请求参数，需要与路径绑定在一起，用；进行分离；
+						在SpringBoot中需要手动开启矩阵变量
+							对于路径的处理，SpringBoot使用UrlPathHelper进行解析，UrlPathHelper里面有一个属性removeSemicolonContent用来表示是否移除矩阵变量，默认为true；
+							开启可以接收矩阵变量
+								方法一
+									在配置类上实现WebMvcConfigurer接口，重写configurePathMatch方法，在该方法中将removeSemicolonContent置为false；
+								方法二
+									在配置类里添加一个Bean，这个Bean的返回值就是WebMvcConfigurer，在该方法内部返回WebMvcConfigurer的匿名对象，在匿名对象里重写configurePathMatch方法；
+						同一个变量名如果有多个值，可以用逗号分隔，也可以写上多个参数名=参数值
+							/cars/seal;price=12;brand=byd,audi
+							/cars/seal;price=12;brand=byd;brand=audi
+						注：使用矩阵变量时，前面一定要带上路径变量，如/cars/{seal}；
+							@MatrixVariable注解里有两个参数，value和pathVar，value表示矩阵变量的名字，pathVar表示是在哪个路径下的矩阵变量，如，/boss/1;age=20/2;age=10；
+				各种类型参数解析原理
+					首先在handlerMappings找到能处理请求Handler（Controller方法）
+					再为当前的Handler找到一个适配器HandlerAdapter
+						HandlerAdapter有四种形式
+							RequestMappingHandlerAdapter：支持方法上标注@RequestMapping（默认返回）；
+							HandlerFunctionAdapter：支持函数式编程； 
+							HttpRequestHandlerAdapter
+							SimpleControllerHandlerAdapter
+					拿到适配器以后才会执行handler方法（mv = ha.handle(processedRequest, response, mappedHandler.getHandler());）
+						在这个ha.handle(processedRequest, response, mappedHandler.getHandler())方法里会获取参数解析器和返回值处理器
+							参数解析器用来对方法输入的参数进行注解的匹配，看每个参数被哪一个注解所修饰；
+							返回值处理器则是对方法的返回值类型进行匹配，看方法的返回值是那种类型；
+						拿到参数解析器和返回值处理器后会接着执行invokeAndHandle(webRequest, mavContainer)方法
+						紧接着会执行ServletInvocableHandlerMethod类里面的invokeForRequest(webRequest, mavContainer, providedArgs)方法
+							在invokeForRequest(webRequest, mavContainer, providedArgs)方法里获取调用getMethodArgumentValues(request, mavContainer, providedArgs)方法获取方法参数值；
+							在getMethodArgumentValues(request, mavContainer, providedArgs)方法里会先获取生成一个与参数长度等长的数组，并且将得到的参数挨个与参数解析器匹配，看哪一个可以解析该注解标注的参数，将匹配成功的解析器返回；
+							获得参数解析器后就开始对参数的进行实际的解析，获取参数值等等操作；
+						最后将所有的数据都放在ModelAndViewContainer中，包含要去的页面地址view，还包含Model数据；
+					复杂参数的解析
+						Map、Model会放在request的请求域（request.setAttribute）中
+							map类型的参数，最终会返回 mavContainer.getModel()--->BindingAwareModelMap是Model也是Map；
+							model类型的参数，最终会返回 mavContainer.getModel()--->BindingAwareModelMap是Model也是Map；
+							map和model的数据放在请求域中是在跳转之前，在视图渲染的那一步进行的；
+						RedirectAttribute（重定向携带数据）；
+						ServletResponse（response）；
+					数据绑定
+						页面提交的请求数据（GET、POST）都可以和对象属性进行绑定；
+						自定义类型参数封装使用ServletModelAttributeMethodProcessor参数解析器；
+						绑定原理
+							找到ServletModelAttributeMethodProcessor参数解析器，对参数进行解析
+								首先判断参数是否为简单类型；
+								接着创建一个Web数据绑定器（WebDataBinder）
+									WebDataBinder利用它里面的Converters（类型转换器）将请求数据转成指定的数据类型；
+									通过反射将转换好的数据赋值给参数；
+										
+						注：Servlet原生API依靠ServletRequestMethodArgumentResolver解析器进行解析；
+						
