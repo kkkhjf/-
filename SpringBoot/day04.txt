@@ -1,0 +1,73 @@
+1、Thymeleaf
+	基本语法
+		表达式
+			变量取值		${...}	获取请求域、session域、对象等数据
+			选择变量		*{...}	获取上下文对象值
+			消息			#{...}	获取国际化等值
+			连接			@{...}	生成链接
+			片段表达式		~{...}	jsp:include作用，引入公共页面
+	使用Thymeleaf
+		SpringBoot使用Thymeleaf，现导入依赖spring-boo-starter-web；
+		自动配置好了Thymeleaf的SpringTemplateEngine和ThymeleafViewResolver；
+		所有Thymeleaf的配置值都在ThymeleafProperties；
+		默认Thymeleaf对templates文件下的页面进行解析，默认后缀是.html；
+	公共页面抽取
+		建一个新的html页面，将页面上的公共代码都放在一起；
+		给每一块公共代码上添加th:fragment="名称"属性；
+		在其他页面引用公共代码时
+			<div th:insert="公共代码页面::公共代码名称"></div>
+			<div th:replace="公共代码页面::公共代码名称"></div>
+			<div th:include="公共代码页面::公共代码名称"></div>
+			th:insert：代码引入后外部会保留<div>标签，会保留th:fragment属性所在的标签；
+			th:replace：代码引入后外部不会保留<div>标签，但是会保留th:fragment属性所在的标签；
+			th:include：只是把<div>里面的代码全部替换掉，不会保留th:fragment属性所在的标签；
+2、视图解析器与视图
+	发送请求时还是先找到合适的处理器，再找到适配器；
+	接着再找到参数解析器和返回值处理器；
+	目标方法处理的过程中，所有数据都会被放在ModelAndViewContainer里面，包括数据和视图地址；
+	方法的参数是一个自定义类型的对象（从请求参数中确定的），把他重新放在ModelAndViewContainer；
+	任何目标方法执行完成以后都会返回ModelAndView；
+	processDispatchResult处理派发结果（页面该如何响应）
+		render方法进行视图渲染
+			根据方法的String返回值得到View对象【定义了页面的渲染逻辑】
+				所有的视图解析器（ContentNegotiatingViewResolver、BeanNameViewResolver、ThymeleafViewResolver、ViewResolverComposite、InternalResourceViewResolver）尝试是否能根据当前返回值得到View对象；
+				得到方法中要跳转的视图名称；
+				ContentNegotiationViewResolver里面包含了下面所有的视图解析器，内部还是利用下面所有视图解析器得到的视图对象；
+				视图对象调用自定义的render进行页面渲染工作，view.render(mv.getModelInternal(), request, response)
+					先获取目标url地址；
+					调用servlet原生api实现页面跳转（forward-->request.getRequestDispatcher(path).forward(request, response); redirect-->response.sendRedirect(url)）；
+3、拦截器
+	拦截器的使用
+		创建一个拦截器类实现HandlerInterceptor接口，重写其中的Handle方法（preHandle方法：目标方法执行前、postHandle方法：目标方法执行完成以后、afterCompletion方法：页面渲染以后）；
+		配置好拦截器要拦截哪些请求；
+		把这些配置放在容器中，在自定义配置类（实现WebMvcConfigurer接口）里重写addInterceptors方法
+			@Override
+			public void addInterceptors(InterceptorRegistry registry){
+				registry.addInterceptor(new LoginInterceptor()).addPathPatterns("拦截的请求").excludePathPatterns("放行的请求");
+			}
+			注：拦截的请求设置为"*/**"，静态资源也会被拦截，解决思路就是把静态资源的访问路径全部加到放行请求里；
+	拦截器原理
+		根据当前请求，找到HandlerExcutionChain【可以处理请求的handler以及handler的所有拦截器】；
+		现在顺序执行所有拦截器的preHandle方法
+			如果返回为true，则执行下一个拦截器的preHandle；
+			如果返回为false，直接但需执行所有已经执行了的拦截器的afterCompletion；
+		如果任何一个拦截器返回false，直接跳出不执行目标方法；
+		所有拦截器都返回true，执行目标方法；
+		倒叙执行所有拦截器的postHandle方法；
+		前面的步骤有任何异常都会直接触发afterCompletion；
+		页面成功渲染完成后，也会倒序触发afterCompletion；
+4、文件上传
+	在接收单个文件时，使用MultipartFile类型；
+	在接收多个文件时，使用MultipartFile[]类型；
+	所有和文件上传的修改都是依据spring.servlet.multipart；
+	文件上传原理
+		文件上传的自动配置封装在MultipartAutoConfiguration里；
+		自动配置好了StandarservletMultipartResolver【文件上传解析器】；
+		原理步骤
+			请求尽力啊使用文件上传解析器判断（isMultipart）并封装（resolveMultipart封装，返回MultipartHttpServletRequest）上传请求；
+			参数解析器（RequestPartMethodArgumentResolve）来解析请求中的文件内容封装成MultipartFile；
+			将request中文件信息封装成一个Map（MultiValueMap<String, MultipartFile>）；
+			获取文件信息就是看@RequestPart注解里的value值对应的是map里的哪一个key的名称；
+		最后使用FileCopyUtils实现文件流的拷贝；
+		
+			
