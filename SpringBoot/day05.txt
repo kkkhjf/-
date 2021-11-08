@@ -1,0 +1,101 @@
+1、异常处理
+	默认规则
+		默认情况下，SpringBoot提供/error处理所有错误的映射；
+		对于机器客户端，它将生成JSON响应，其中包含错误，HTTP状态和异常的详细信息；
+		对于浏览器客户端，响应一个“whitelabel”错误视图，以HTML格式呈现相同的数据；
+		要对其进行自定义，添加View解析为error（在templete文件夹下创建一个error文件夹，在里面存放4xx.html或5xx.html，浏览器产生4开头的或5开头的错误代码都会自动调换到对应的页面，可以放具体的错误页面404.html）;
+		要完全替换默认行为，可以实现ErrorController并注册该类型的Bean定义，或添加ErrorAttributes类型的组件以使用现有机制但替换其内容；
+	异常处理的自动配置原理
+		ErrorMvcAutoConfiguration自动配置异常处理规则
+			容器内的组件DefaultErrorAttributes-->id：errorAttributes
+				该组件实现public class DefaultErrorAttributes implements ErrorAttributes, HandlerExceptionResolver, Ordered；
+				DefaultErrorAttributes：定义错误页面中可以包含哪些数据；
+			容器内的组件BasicErrorController-->id：errorAttributes
+				处理/error路径的请求，页面响应new ModelAndView("error",model)；
+				容器中有组件View-->id：error（响应默认错误页）；
+				容器中放组件BeanNameViewResolver【视图解析器】，按照返回的视图名作为组件id去容器中找View对象；
+				如果想要返回页面，就会找error视图【staticView】，默认是一个白页；
+			容器内的组件DefaultErrorViewResolver-->id：conventionErrorViewResolver
+				如果发生错误，会以HTTP状态码作为视图也地址viewName，找到真正的页面；
+	异常处理流程
+		执行目标方法，目标方法运行期间有任何异常都会被catch、而且标志当前请求结束，并且用dispatchException把异常信息封装起来；
+		进入视图解析流程（页面渲染）
+			processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);
+				 执行mv = this.processHandlerException(request, response, handler, exception)，处理handler发生的异常，处理完成返回ModelAndView；
+					遍历所有的handlerExceptionResolve，看谁能处理当前异常【HandlerExceptionResolver处理器异常解析器】；
+					系统默认异常解析器（DefaultErrorAttributes、HandlerExceptionResloverComposite、ExceptionHandlerExceptionResolver、ResponseStatusExceptionResolver、DefaultHandlerExceptionResolver）；
+						DefaultErrorAttributes：把异常信息保存到request域，并且返回null；
+						默认没有任何人能处理异常，所以异常会被抛出；
+						如果没有任何人能处理，底层最终就会发送/error请求
+							/error请求会被底层的BasicErrorController处理；
+							解析错误视图，遍历所有的ErrorViewResolver看谁能解析；
+							默认的DefaultErrorViewResolver把响应状态码作为错误页的地址，拼接error/响应状态码.html；
+							模板引擎最终响应这个页面；
+	定制错误处理逻辑
+		自定义错误页
+			error/404.html error/5xx.html；有精确的错误状态代码页面就精确匹配，没有就找4xx.html；如果都没有就出发白页；
+		@ControllerAdvice+@ExceptionHandler处理全局异常（使用ExceptionHandlerExceptionResolver异常解析器解析）；
+		@ResponseStatus+自定义异常处理（使用ResponseStatusExceptionResolver异常解析器解析异常，把注解的信息底层调用response.sendError(statusCode，resolvedReason)，tomcat发送/error请求）
+			在自定义的异常类上加上@ResponseStatus注解，注解里的value属性为错误状态代码，reason属性为错误信息；
+			当用户抛出被该注解标识的异常时，SpringBoot会去按照错误状态代码去寻找对应的异常页面；
+		Spring底层异常（使用DefaultHandlerExceptionResolver异常处理器处理框架底层异常），如参数类型转换异常；
+		自定义实现HandlerExceptionResolver处理异常
+			重写resolveException(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e)方法；
+			根据具体的异常类型，使用response.sendError(statusCode，resolvedReason)将异常交给SpringBoot处理异常，并将异常信息返回给指定的statusCode页面；
+			如果想要将自定义的异常解析器优先执行，需要在自定义的异常处理器上加上@Order(value = Ordered.HIGHEST_PRECEDENCE)注解，数字越小优先级越高；
+		ErrorViewResolver实现自定义处理异常
+			使用response.sendError(statusCode，resolvedReason)，error请求就会转给controller；
+			你的异常没有任何人能处理，tomcat底层会发出response.sendError(statusCode，resolvedReason)，error就会转给controller；
+			controller实际就是BasicErrorController，而BasicErrorController要去的页面地址时ErrorViewResolver来解析；
+2、Web原生组件注入（Servlet、Filter、Listener）
+	使用Servlet API
+			在SpringBoot的主类上添加@ServletComponentScan(basePackages = 扫描的路径)：指定原生Servlet组件都放在哪里；
+		Servlet
+			自定义一个Servlet类，继承HttpServlet，重写doGet或者doPost方法，并在类上标注@WebServlet注解；
+			@WebServlet(urlPatterns = 请求路径)：直接响应该请求，没有经过SpringBoot的拦截器；
+		Filter
+			自定义一个Filter类，实现Filter接口，重写接口里的方法，并在类上标注@WebFilter(urlPatterns={拦截的请求路径})注解；
+		Listener
+			自定义一个Listener类实现ServletContextListener接口，重写contextInitialized方法，并在类上标注@WebListener注解；
+	使用RegistrationBean
+		自定义一个Servlet类，继承HttpServlet，重写doGet或者doPost方法；
+		自定义一个Filter类，实现Filter接口，重写接口里的方法；
+		自定义一个Listener类实现ServletContextListener接口，重写contextInitialized方法；
+		创建一个配置类，使用@Configuration注解标注；
+		在该配置类里添加3个Bean（返回类型为：ServletRegistrationBean、FilterRegistrationBean和ServletListenerRegistrationBean）
+			ServletRegistrationBean
+				在该Bean里声明一个自定义的Servlet类，并在返回的时候返回ServletRegistrationBean对象（new ServletRegistrationBean(声明的Servlet类，需要处理的请求路径)）；
+			FilterRegistrationBean
+				拦截路径的确定
+					方式一
+						在该Bean中声明一个自定义的Filter类，直接返回FilterRegistrationBean对象（自定义的Filter类，返回类型为ServletRegistrationBean的方法），这样拦截返回类型为ServletRegistrationBean方法里的请求路径；
+					方式二
+						声明一个FilterRegistrationBean对象（new FilterRegistrationBean(自定义Filter类对象)），再调用seturlPatterns(拦截路径)，最后返回FilterRegistrationBean对象；
+			ServletListenerRegistrationBean
+				在该Bean里声明一个自定义Listener类，并返回ServletListenerRegistrationBean对象（new ServletListenerRegistrationBean(自定义Listener类)）；
+	DispatcherServlet的自动配置
+		DispatcherServletAutoConfiguration自动配置类将DispatcherServlet自动配置进容器，将其属性绑定到WebMvcProperties，对应的配置文件是spring.mvc；
+		通过ServletRegistrationBean<DispatcherServlet>把DispatchServlet配置进来；
+		默认映射的是"/"路径；
+		注：Tomcat-Servlet多个Servlet都能处理到同一层路径，精确优先匹配原则，如果Tomcat中有多个Servlet会依照请求来决定具体调用哪一个Servlet进行处理，
+				如果没有经过DispatcherServlet处理则不会执行DispatcherServlet中设置的拦截器，所以如果自己自定义了Servlet，发送的请求若被自定义的Servlet处理，则不会调用DispatcherServlet中配置的拦截器；
+3、嵌入式Servlet容器
+	默认支持的webServer
+		Tomcat、Jetty和Undertow；
+		ServletWebServerWebApplicationContext容器启动寻找ServletWebServerFactory，并引导创建服务器；
+	原理
+		SpringBoot应用启动发现当前是Web应用，web场景包导入tomcat；
+		web应用会创建一个web版的ioc容器ServletWebServerApplicationContext；
+		ServletWebServerApplicationContext启动时寻找ServletWebServerFactory（Servlet的web服务器工厂-->Servlet的web服务器）；
+		SpringBoot底层默认有很多工厂（TomcatServerWevServerFactory、JeetyServletWebServerFactory和UndertowServletWebServerFactory）；
+		底层直接会有一个自动配置类，ServletWebServerFactoryAutoConfiguration；
+		ServletWebServerFactoryAutoConfiguration导入了ServletWebServerFactoryConfiguration（配置类）
+		ServletWebServerFactoryConfiguration配置类，根据动态判断系统中到底导入了哪个Web服务器的包（默认是tomcat），容器中就有TomcatServletWebServerFactory；、
+		TomcatServletWebServerFactory就会创建Tomcat服务器（TomcatWebServer的构造器拥有初始化方法initialize-->this.tomcat.start()）并启动；
+	切换服务器
+		tomcat服务器的包默认在spring-boot-start-tomcat依赖中；
+		切换步骤
+			首先在spring-boot-start-tomcat依赖中排除tomcat包的依赖（spring-boot-starter-tomcat）；
+			再把想要使用的服务器依赖导入进来；
+	定制化服务器
+		实现WebServerFactoryCustomizer<ConfigurableServletWebServerFactory>接口或者直接在配置文件中用server属性修改服务器属性；
