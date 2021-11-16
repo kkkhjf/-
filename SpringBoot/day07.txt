@@ -1,0 +1,45 @@
+1、单元测试
+	SpringBoot单元测试默认使用Junit5；
+	在测试类上添加@SpringBootTest注解，在里面的方法上加上@Test注解；
+	在测试方法上标注@Transactional注解，测试完成后会自动回滚；
+	SpringBoot2.4以上版本就不能使用Junit4；
+	Junit5常用注解
+		@Test：标注测试方法；
+		@DisplayName：标注测试类或者测试方法，给测试类或者测试方法起别名；
+		@BeforeEach：标注测试方法，被标注的方法会在测试方法执行前执行；
+		@AfterEach：标注测试方法，被标注的方法会在测试方法执行后执行；
+		@BeforeAll：标注测试方法，被标注的方法会在所有测试开始前执行；
+		@AfterAll：标注测试方法，被标注的方法会在所有测试结束后执行；
+		@Disabled：标注测试方法，被标注的方法不会在运行所有测试方法时被执行；
+		@TimeOut：标注测试方法，被标注的方法如果超时，就会出异常；
+		@RepeatedTest：标注测试方法，被标注的方法会重复执行n次；
+		@ExtendWith：标注测试类（被整合进@SpringTest注解），被标注的测试类可以拿到容器内的实例；
+	断言
+		所有的测试运行结束以后，会有一个详细的测试报告；
+		前面的断言失败，后面的代码不会继续执行；
+		断言方法
+			assertEquals：判断测试结果是否和预期相等；
+			assertNotEqual
+			assertSame：两个对象的引用是否一样；
+			assertArrayEquals：判断两个数组是否相等；
+			assertAll：组合断言，可以在里面写多个断言（使用逗号分隔），只有所有的断言都成功运行，组合断言才算成功；
+			assertThrows：判断测试的方法是否抛出指定的异常，没有抛出指定的异常则断言失败；
+			assertTimeout：超时断言，测试方法超过指定的时间，则断言失败；
+			fail：快速失败，指定fail(String message)函数，则直接抛出异常，并显示message信息；
+	前置条件
+		不满足前置条件则直接终止执行，而不是出现测试失败；
+		assumeTrue：结果是否为True；
+		assumerFalse：结果是否为False；
+2、原理解析
+	Profile环境切换
+		环境切换
+			默认配置文件application.yaml，任何时候都会加载；
+			指定环境配置文件application-{env}.yaml，中间用-分隔；
+			激活指定环境，在默认配置文件中使用spring.profiles.active属性指定需要激活的环境，或者项目打包完成后使用cmd激活（java -jar jar包名称 --spring.profiles.active=环境名）；
+			默认配置文件与环境配置同时生效，同名配置项，profile配置优先；
+		条件装配
+			@Profile注解标注在类上表示该类在特定环境才会被装配进容器；
+			注：没有整合@Component注解，所以需要加上@Component注解；
+		profile分组
+			spring.profile.group.组名[n]=环境名称；
+			可以把多个环境配置文件一起加载，类似于数组；
