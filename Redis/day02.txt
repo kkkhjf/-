@@ -1,0 +1,65 @@
+1、Redis配置文件
+    配置大小单位，只支持bytes，不支持bit，大小写不敏感；
+    bind 127.0.0.1 -::1
+    protected-mode yes
+        表示只支持本地连接，如果想让其他主机远程连接，注释掉bind，并且把protected-mode yes改成protected-mode no；
+    tcp-backlog 511
+        设置tcp的backlog，backlog其实是一个连接队列，backlog队列总和=未完成三次握手队列+已经完成三次握手队列；
+        在高并发环境下你需要一个高backlog值来避免客户端连接慢问题；
+    timeout 0
+        redis未操作的最长时间，0为永不超时；
+    tcp-keepalive 300
+        每隔300秒进行一次检测，看看连接是否还存活；
+    daemonize yes
+        是否为后台进程，设置为yes；
+    pidfile
+        存方pid文件的位置，每个实例会产生一个不同的pid文件；
+    loglevel notice
+       设置redis的日志级别，debug、verbose、notice和warning，默认为notice；
+    logfile
+        设置redis的日志路径，默认为空；
+    databases 16
+        设置redis的数据库数量，默认为0号库；
+    设置密码
+        进入reids，输入config get requirepass，再使用config set requirepass "123456"设置密码，最后使用auth 123456；
+    maxclients
+        设置redis同时可以与多少个客户端进行连接，默认是10000个客户端，如果达到了此限制，redis则会拒绝新的连接请求，并且向这些连接请求方发出“max number of clients reached”；
+    maxmemory
+        设置redis可以使用的内存量，一旦达到内存上限，redis将会视图移除内部数据，移除规则可以通过maxmemory-policy指定；
+    maxmemory-policy
+        volatile-lru：使用LRU算法移除key，支队设置了过期时间的键（最近最少使用）；
+        allkeys-lru：在所有集合key中，使用LRU算法移除key；
+        volatile-random：在过期集合中移除随机的key，只对设置了过期时间的键；
+        allkeys-random：在所有集合key中，移除uiji的key；
+        volatile-ttl：移除那些TTL值最小的key，即那些最近要过期的key；
+        noeviction：不进行移除，针对写操作，只是返回错误信息；
+2、发布和订阅
+    redis发布订阅（pub/sub）是一种消息通信模式，发送者（pub）发送消息，订阅者（sub）接收消息；
+    redis可以订阅任意数量的频道；
+    发布和订阅的使用
+        SUBSCRIBE 频道名称
+            订阅频道；
+        publish 频道名称 消息
+            向该频道发送消息；
+3、redis新类型
+    Bitmaps
+        Bitmaps本身不是一个数据类型，实际上它就是字符串（key-value），但是它可以对字符串的位进行操作；
+        Bitmaps可以看作是一个以位为单位的数组，数组的每个单元只能存储0和1，索引下标称为偏移量；
+        常用命令
+            setbit key offset value：设置Bitmaps中某个偏移量的值（0或1）；
+            getbit key offset：取出key集合里偏移量为offset的值；
+            bitcount key sindex eindex：统计key集合中值为1的数量，sindex到eindex之间，默认是全部集合，-1代表最后一位，-2代表倒数第二位；
+            bitop and(or/not/xor)
+    HyperLogLog
+        HyperLogLog是用来做基数统计的算法，在输入元素的数量或者体积非常大时，计算技术所需的空间总是固定的、并且是很小的，基数估计就是在误差可接受范围内，快速计算基数；
+        常用命令
+            pfadd key element1 element2...：添加指定元素到HyperLogLog中；
+            pfcount key：计算HLL的近似基数；
+            pfmerge key1 key2：将key2和key3合并后的结果存入进key1中；
+    GEO
+        redis基于该类型，提供了经纬度设置，查询，范围查询，距离查询，经纬度Hash等常见操作；
+        常见命令
+            geoadd key 经度 纬度 value：添加地理位置，可以同时添加多个经纬度；
+            geopos key value：取出key集合中对应value的经纬度；
+            geodist key value1 value2 单位：获取value1和value2两个位置之间的直线距离（单位：m、km、mi英里、ft英尺）；
+            georadius key 经度 纬度 半径 单位：以给定的经纬度为中心，找出某一半径内的元素，单位同上；
