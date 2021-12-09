@@ -1,0 +1,55 @@
+1、事务和锁机制
+    事务
+        Redis事务是一个单独隔离操作，事务中的所有命令都会序列化、按顺序地执行，事务在执行的过程中，不会被其他客户端发送来的命令请求所打断；
+        Redis事务的主要作用就是串联多个命令防止别的命令插队；
+        基本命令
+            Multi
+                从输入Multi命令开始，输入的命令都会一次进入命令队列中，但不会执行；
+            Exec
+                输入Exec命令，Redis会将之前的命令队列中的命令依次执行；
+            discard
+                组队阶段（输入Multi后，输入Exec前）可以通过discard命令来放弃组队；
+        事务的错误处理
+            组队中某个命令出现了报告错误，执行时整个的所有队列都会被取消；
+            如果执行阶段某个命令报错，只有出现错误的命令不会被执行，其他的命令仍然会被执行；
+    锁
+        悲观锁
+            给一个操作上锁后别人就不能继续操作了，只有解锁后才可以继续操作；
+        乐观锁（适用于多读的操作）
+            操作数据时给数据加上版本号，每个对该数据的操作都会带上版本号，第一次操作数据时更新数据的版本号，每次操作都会比较数据的版本号是否为最新，否则不允许操作；
+        常用命令
+            乐观锁：watch key：在执行multi命令之前，先执行watch key1...，可以监视多个key，如果在事务执行之前key被其他命令改动，那么事务将被打断；
+                   unwatch：取消对所有key的监视；
+        redis事务的三特性
+            单独的隔离操作
+                事务中的所有命令都会序列化、按顺序地执行，事务在执行过程中，不会被其他客户端发送过来地命令请求所打断；
+            没有隔离级别地概念
+                队列中的命令在exec之前都不会被实际地执行，因为事务提交前任何指令都不会被实际执行；
+            不保证原子性
+                事务中如果有一条命令执行失败，气候的命令仍然会被执行，没有回滚；
+        秒杀出现的问题
+            连接超时
+                使用连接池
+                    public static JedisPool getJedisPoolInstance(){
+                            if(null == jedisPool){
+                                synchronized (JedisPoolUtil.class){
+                                    if(null == jedisPool){
+                                        JedisPoolConfig poolConfig = new JedisPoolConfig();
+                                        poolConfig.setMaxTotal(200);
+                                        poolConfig.setMaxIdle(20);
+                                        poolConfig.setMaxWaitMillis(100*1000);
+                                        poolConfig.setBlockWhenExhausted(true);
+                                        poolConfig.setTestOnBorrow(true);
+                                        jedisPool = new JedisPool(poolConfig, "192.168.45.3", 6379, 60000);
+                                    }
+                                }
+                            }
+                            return jedisPool;
+                        }
+            超卖问题
+                通过乐观锁解决，jedis.watch(key)实现对key地监控；
+                通过jedis.multi()获取multi对象，再将对库存和用户的操作添加到队列中；
+            库存遗留问题
+                使用Lua脚本解决遗留问题；
+                Lua脚本再Redis中的优势
+                    Lua脚本类似于redis事务，有一定的原子性，不会被其他命令插队，可以完成一些redis事务性的操作；
