@@ -1,0 +1,154 @@
+1、Jedis操作Redis
+    引入依赖
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>3.2.0</version>
+        </dependency>
+    创建Jedis对象，通过Jedis对象来操控Redis
+        操作Key
+            //创建Jedis对象
+            Jedis jedis = new Jedis("192.168.45.3", 6379);
+            //向Redis中添加键值对
+            jedis.set("name", "Lucy");
+            String name = jedis.get("name");
+            System.out.println(name);
+            //获取redis中的key
+            Set<String> keys = jedis.keys("*");
+            for (String key : keys){
+                System.out.println(key);
+            }
+            //添加多个键值对,并获取
+            jedis.mset("k1", "v1", "k2", "v2");
+            List<String> mget = jedis.mget("k1", "k2");
+        操作List
+            //从左边放入集合
+            jedis.lpush("key1", "lucy", "mary", "jack");
+            //从左边取出数据
+            List<String> values = jedis.lrange("key1", 0, -1);
+        操作set
+            jedis.sadd("name", "lucy", "jack");
+            Set<String> name = jedis.smembers("name");
+        操作hash
+            jedis.hset("users", "age", "20");
+            String hget = jedis.hget("users", "age");
+        操作zset
+            jedis.zadd("zset", 100, "z1");
+            jedis.zadd("zset", 80, "z2");
+            jedis.zadd("zset", 90, "z3");
+            jedis.zadd("zset", 70, "z4");
+            Set<String> zset = jedis.zrange("zset", 0, -1);
+            for (String e : zset){
+                System.out.println(e);
+            }
+2、手机验证码
+    输入手机号，点击发送后随机生成6位数字验证码，2分钟有效
+        Random函数随机生成6位数字验证码；
+        验证码放进Redis设置过期时间为120秒；
+    输入验证码点击验证，返回成功或失败
+        从Redis获取验证码和输入的验证码进行比较；
+    每个手机号每天只能输入3次
+        incr每次发送后加1，大于2的时候提交不能发送；
+3、SpringBoot整合Redis
+    引入依赖
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <version>2.5.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+            <version>2.10.0</version>
+        </dependency>
+    在SpringBoot配置文件中配置redis配置
+        #redis服务器地址
+        spring.redis.host=192.168.45.3
+        #redis服务连接端口号
+        spring.redis.port=6379
+        #redis数据库索引（默认为0）
+        spring.redis.database=0
+        #连接超时时间（毫秒）
+        spring.redis.timeout=1800000
+        #连接池最大连接数
+        spring.redis.lettuce.pool.max-active=20
+        #最大阻塞时间（负数表示没有限制）
+        spring.redis.jedis.pool.max-wait=-1
+        #连接池中的最大空闲连接
+        spring.redis.jedis.pool.max-idle=5
+        #连接池中的最小空闲连接
+        spring.redis.jedis.pool.min-idle=0
+    添加redis配置类
+        package com.hejianfeng.springboot_redis.config;
+
+        import com.fasterxml.jackson.annotation.JsonAutoDetect;
+        import com.fasterxml.jackson.annotation.PropertyAccessor;
+        import com.fasterxml.jackson.databind.ObjectMapper;
+        import org.springframework.cache.CacheManager;
+        import org.springframework.cache.annotation.CachingConfigurerSupport;
+        import org.springframework.cache.annotation.EnableCaching;
+        import org.springframework.context.annotation.Bean;
+        import org.springframework.context.annotation.Configuration;
+        import org.springframework.data.redis.cache.RedisCacheConfiguration;
+        import org.springframework.data.redis.cache.RedisCacheManager;
+        import org.springframework.data.redis.connection.RedisConnectionFactory;
+        import org.springframework.data.redis.core.RedisTemplate;
+        import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+        import org.springframework.data.redis.serializer.RedisSerializationContext;
+        import org.springframework.data.redis.serializer.RedisSerializer;
+        import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+        import java.time.Duration;
+
+        /**
+         * @author HJF
+         * @create 2021/12/9
+         */
+        @EnableCaching
+        @Configuration
+        public class RedisSpringbootApplication extends CachingConfigurerSupport {
+
+            @Bean
+            public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory){
+                RedisTemplate<String, Object> template = new RedisTemplate<>();
+                RedisSerializer<String> redisSerializer = new StringRedisSerializer();
+                Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
+                ObjectMapper om = new ObjectMapper();
+                om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+                om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+                jackson2JsonRedisSerializer.setObjectMapper(om);
+                template.setConnectionFactory(factory);
+                //key序列化方式
+                template.setKeySerializer(redisSerializer);
+                //value序列化方式
+                template.setValueSerializer(jackson2JsonRedisSerializer);
+                //value hashmap序列化
+                template.setHashValueSerializer(jackson2JsonRedisSerializer);
+                return template;
+            }
+
+            @Bean
+            public CacheManager cacheManager(RedisConnectionFactory factory){
+                RedisSerializer<String> redisSerializer = new StringRedisSerializer();
+                Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
+                //解决查询缓存转换异常的问题
+                ObjectMapper om = new ObjectMapper();
+                om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+                om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+                jackson2JsonRedisSerializer.setObjectMapper(om);
+                //配置序列化(解决乱码问题)，过期时间600秒
+                RedisCacheConfiguration configuration = RedisCacheConfiguration.defaultCacheConfig()
+                        .entryTtl(Duration.ofSeconds(600))
+                        .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(redisSerializer))
+                        .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jackson2JsonRedisSerializer))
+                        .disableCachingNullValues();
+                RedisCacheManager cacheManager = RedisCacheManager.builder(factory)
+                        .cacheDefaults(configuration)
+                        .build();
+                return cacheManager;
+            }
+
+        }
+
+
+
